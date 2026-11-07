@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Фонетический тренажер — все уровни</title>
+<style>
+    * { box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; background-color: #f0f2f5; color: #333; display: flex; flex-direction: column; align-items: center; }
+    .header { background-color: #1F3A5F; color: #fff; width: 100%; padding: 20px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    .header h1 { margin: 0; font-size: 26px; }
+    .header p { margin: 5px 0 0; color: #a8c0d8; font-size: 15px; }
+    .container { width: 950px; max-width: 96%; margin: 25px 0; }
+    .levels { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
+    .level-btn { flex: 1; min-width: 110px; padding: 14px 8px; border: none; border-radius: 10px; background-color: #fff; color: #555; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 6px rgba(0,0,0,0.06); line-height: 1.3; }
+    .level-btn:hover { background-color: #e8f0fe; color: #1F3A5F; }
+    .level-btn.active { background-color: #C0392B; color: #fff; box-shadow: 0 4px 12px rgba(192,57,43,0.35); }
+    .level-btn .lvl-num { display: block; font-size: 20px; margin-bottom: 2px; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+    .tab-btn { flex: 1; min-width: 110px; padding: 12px; border: none; border-radius: 8px; background-color: #fff; color: #555; font-size: 14px; font-weight: bold; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    .tab-btn:hover { background-color: #e8f0fe; color: #1F3A5F; }
+    .tab-btn.active { background-color: #1F3A5F; color: #fff; box-shadow: 0 4px 10px rgba(31,58,95,0.3); }
+    .tab-btn.test-tab.active { background-color: #27ae60; }
+    .section { display: none; }
+    .section.active { display: block; animation: fadeIn 0.3s; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .card { background: #fff; border-radius: 12px; padding: 25px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-left: 6px solid #C0392B; }
+    .card h2 { margin-top: 0; color: #1F3A5F; font-size: 21px; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+    .diagram { display: flex; align-items: center; gap: 20px; background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+    .diagram svg { width: 140px; height: 90px; flex-shrink: 0; }
+    .diagram-text { font-size: 15px; color: #444; line-height: 1.4; }
+    .diagram-text strong { color: #C0392B; }
+    .words-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
+    @media (max-width: 700px) { .words-grid { grid-template-columns: 1fr; } }
+    .example-block { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px; transition: 0.2s; }
+    .example-block:hover { border-color: #1F3A5F; box-shadow: 0 2px 10px rgba(31,58,95,0.1); transform: translateY(-2px); }
+    .ex-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .ex-en { font-size: 17px; font-weight: bold; color: #1F3A5F; cursor: pointer; transition: 0.2s; }
+    .ex-en:hover { color: #C0392B; text-decoration: underline; }
+    .ex-ru { font-size: 13px; color: #666; font-style: italic; text-align: right; }
+    .ex-tip { font-size: 12px; color: #C0392B; }
+    .btn-row { display: flex; gap: 6px; flex-wrap: wrap; align-self: flex-start; }
+    .btn-sound { display: inline-flex; align-items: center; justify-content: center; padding: 8px 14px; border-radius: 6px; border: none; cursor: pointer; font-size: 14px; font-weight: bold; transition: 0.3s; background: #1F3A5F; color: #fff; box-shadow: 0 2px 4px rgba(31,58,95,0.2); }
+    .btn-sound:hover { background: #152943; transform: translateY(-1px); }
+    .btn-sound.speaking { background: #C0392B; }
+    .btn-sound:disabled { opacity: 0.6; cursor: wait; }
+    .btn-slow { background: #7f8c8d; }
+    .btn-slow:hover { background: #5d6d6e; }
+    .btn-slow.speaking { background: #C0392B; }
+    .wave-container { display: none; align-items: flex-end; gap: 3px; height: 20px; margin-top: 5px; }
+    .wave-container.active { display: flex; }
+    .bar { width: 4px; background-color: #C0392B; border-radius: 2px; animation: bounce 1s infinite alternate; }
+    .bar:nth-child(1) { height: 8px; animation-delay: 0.1s; }
+    .bar:nth-child(2) { height: 20px; animation-delay: 0.3s; }
+    .bar:nth-child(3) { height: 12px; animation-delay: 0.2s; }
+    .bar:nth-child(4) { height: 24px; animation-delay: 0.4s; }
+    .bar:nth-child(5) { height: 10px; animation-delay: 0.1s; }
+    .bar:nth-child(6) { height: 16px; animation-delay: 0.5s; }
+    @keyframes bounce { 0% { transform: scaleY(0.5); opacity: 0.7; } 100% { transform: scaleY(1); opacity: 1; } }
+    .quiz-container { text-align: center; padding: 20px 0; }
+    .quiz-word { font-size: 38px; font-weight: bold; color: #1F3A5F; margin-bottom: 10px; }
+    .quiz-word-row { display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+    .btn-quiz-sound { background: #1F3A5F; color: #fff; border: none; border-radius: 8px; padding: 10px 14px; font-size: 16px; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 6px rgba(31,58,95,0.2); }
+    .btn-quiz-sound:hover { background: #152943; }
+    .btn-quiz-sound.slow { background: #7f8c8d; }
+    .btn-quiz-sound.slow:hover { background: #5d6d6e; }
+    .quiz-counter { font-size: 14px; color: #888; margin-bottom: 10px; }
+    .quiz-hint { font-size: 16px; color: #666; margin-bottom: 25px; }
+    .options { display: flex; flex-direction: column; gap: 12px; max-width: 520px; margin: 0 auto; }
+    .option-btn { padding: 15px 20px; border: 2px solid #ddd; border-radius: 8px; background: #fff; font-size: 17px; cursor: pointer; transition: 0.2s; color: #333; text-align: left; }
+    .option-btn:hover:not(:disabled) { border-color: #1F3A5F; background: #f8f9fa; }
+    .option-btn:disabled { cursor: default; opacity: 0.85; }
+    .option-btn.correct { background: #eafaf1; border-color: #27ae60; color: #27ae60; font-weight: bold; }
+    .option-btn.wrong { background: #fdf0ed; border-color: #C0392B; color: #C0392B; text-decoration: line-through; }
+    .quiz-score { font-size: 20px; font-weight: bold; color: #27ae60; margin-top: 20px; }
+    .btn-next { background: #27ae60; color: #fff; padding: 12px 30px; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; display: none; margin-top: 20px; }
+    .btn-next:hover { background: #219653; }
+    .btn-restart { background: #C0392B; color: #fff; padding: 10px 22px; border: none; border-radius: 8px; font-size: 15px; cursor: pointer; margin-top: 12px; display: inline-block; }
+    .btn-restart:hover { background: #a93226; }
+</style>
+</head>
+<body>
+
+<div class="header">
+    <h1>🎧 Фонетический тренажер</h1>
+    <p>5 уровней · 🔊 обычная скорость · 🐢 медленная для тренировки</p>
+</div>
+
+<div class="container">
+    <div class="levels" id="levels-container"></div>
+    <div class="tabs" id="tabs-container"></div>
+    <div id="content-container"></div>
+</div>
+
+<script>
+/* =====================================================================
+   БАЗА ДАННЫХ — ВСЕ 5 УРОВНЕЙ
+   ===================================================================== */
+
+const ALL_LEVELS = [
+  {
+    id: "level1", title: "Уровень 1", subtitle: "База: /θ/, /ð/, Flap T, связная речь",
+    sections: [
+      {
+        id: "L1S1", title: "/θ/ (глухой)", isTest: false,
+        description: '<div class="diagram"><svg viewBox="0 0 100 100"><path d="M10,40 Q50,10 90,40" stroke="#3498db" stroke-width="4" fill="none"/><rect x="70" y="35" width="10" height="20" fill="#fff" stroke="#bdc3c7"/><rect x="70" y="65" width="10" height="20" fill="#fff" stroke="#bdc3c7"/><path d="M20,70 Q60,60 75,55 L80,50 L70,45 Q50,55 20,65 Z" fill="#e74c3c" opacity="0.8"/></svg><div class="diagram-text"><strong>Правило:</strong> Кончик языка <strong>между зубами</strong>. Голос не вибрирует (как «с» с языком между зубами).</div></div>',
+        words: [
+          { en: "Think", ru: "Думать", tip: "Звук /θ/ в начале." },
+          { en: "Thank", ru: "Благодарить", tip: "Звук /θ/ в начале." },
+          { en: "Three", ru: "Три", tip: "Звук /θ/ в начале." },
+          { en: "Thin", ru: "Тонкий", tip: "Звук /θ/ в начале." },
+          { en: "Thick", ru: "Толстый", tip: "Звук /θ/ в начале." },
+          { en: "Bath", ru: "Ванна", tip: "Звук /θ/ в конце." },
+          { en: "Math", ru: "Математика", tip: "Звук /θ/ в конце." },
+          { en: "Teeth", ru: "Зубы", tip: "Звук /θ/ в конце." },
+          { en: "Mouth", ru: "Рот", tip: "Звук /θ/ в конце." },
+          { en: "Earth", ru: "Земля", tip: "Звук /θ/ в конце." },
+          { en: "Healthy", ru: "Здоровый", tip: "Звук /θ/ в середине." },
+          { en: "Author", ru: "Автор", tip: "Звук /θ/ в середине." },
+          { en: "Method", ru: "Метод", tip: "Звук /θ/ в середине." },
+          { en: "Nothing", ru: "Ничего", tip: "Звук /θ/ в середине." },
+          { en: "Something", ru: "Что-то", tip: "Звук /θ/ в середине." }
+        ]
+      },
+      {
+        id: "L1S2", title: "/ð/ (звонкий)", isTest: false,
+        description: '<div class="diagram"><svg viewBox="0 0 100 100"><path d="M10,40 Q50,10 90,40" stroke="#3498db" stroke-width="4" fill="none"/><rect x="70" y="35" width="10" height="20" fill="#fff" stroke="#bdc3c7"/><rect x="70" y="65" width="10" height="20" fill="#fff" stroke="#bdc3c7"/><path d="M20,70 Q60,60 75,55 L80,50 L70,45 Q50,55 20,65 Z" fill="#e74c3c" opacity="0.8"/></svg><div class="diagram-text"><strong>Правило:</strong> Кончик языка <strong>между зубами</strong>. Голос вибрирует (как «з» с языком между зубами).</div></div>',
+        words: [
+          { en: "This", ru: "Это", tip: "Звук /ð/ в начале." },
+          { en: "That", ru: "Тот", tip: "Звук /ð/ в начале." },
+          { en: "These", ru: "Эти", tip: "Звук /ð/ в начале." },
+          { en: "Those", ru: "Те", tip: "Звук /ð/ в начале." },
+          { en: "They", ru: "Они", tip: "Звук /ð/ в начале." },
+          { en: "Them", ru: "Их", tip: "Звук /ð/ в начале." },
+          { en: "There", ru: "Там", tip: "Звук /ð/ в начале." },
+          { en: "Then", ru: "Тогда", tip: "Звук /ð/ в начале." },
+          { en: "Than", ru: "Чем", tip: "Звук /ð/ в начале." },
+          { en: "Mother", ru: "Мама", tip: "Звук /ð/ в середине." },
+          { en: "Father", ru: "Папа", tip: "Звук /ð/ в середине." },
+          { en: "Brother", ru: "Брат", tip: "Звук /ð/ в середине." },
+          { en: "Weather", ru: "Погода", tip: "Звук /ð/ в середине." },
+          { en: "Breathe", ru: "Дышать", tip: "Звук /ð/ в середине." },
+          { en: "Clothe", ru: "Одевать", tip: "Звук /ð/ в середине." }
+        ]
+      },
+      {
+        id: "L1S3", title: "Flap T (US)", isTest: false,
+        description: '<div class="diagram"><svg viewBox="0 0 120 100"><path d="M10,40 Q60,10 110,40" stroke="#3498db" stroke-width="4" fill="none"/><path d="M40,70 Q70,50 90,60" stroke="#e74c3c" stroke-width="8" fill="none" stroke-linecap="round" opacity="0.6"/></svg><div class="diagram-text"><strong>Правило:</strong> Буква <strong>T</strong> между гласными звучит как <strong>D</strong> (или мягкое «р»).</div></div>',
+        words: [
+          { en: "Water", ru: "Вода", tip: "Звучит «Wader» — T превращается в D." },
+          { en: "Better", ru: "Лучше", tip: "Звучит «Beder»." },
+          { en: "City", ru: "Город", tip: "Звучит «Cidy»." },
+          { en: "Letter", ru: "Письмо", tip: "Звучит «Leder»." },
+          { en: "Later", ru: "Позже", tip: "Звучит «Lader»." },
+          { en: "Party", ru: "Вечеринка", tip: "Звучит «Pardy»." },
+          { en: "Dirty", ru: "Грязный", tip: "Звучит «Dirdy»." },
+          { en: "Thirty", ru: "Тридцать", tip: "Звучит «Thirdy»." },
+          { en: "Pretty", ru: "Красивый", tip: "Звучит «Predy»." },
+          { en: "Little", ru: "Маленький", tip: "Двойная T — звучит «Lidl»." },
+          { en: "Bottle", ru: "Бутылка", tip: "Двойная T — звучит «Badl»." },
+          { en: "Middle", ru: "Середина", tip: "Двойная T — звучит «Midl»." },
+          { en: "I want a bottle of water", ru: "Фраза", tip: "Звучит: I wanna badel of wader." },
+          { en: "What are you doing?", ru: "Что ты делаешь?", tip: "Звучит: Whad-are-you-doing." },
+          { en: "Get out of here", ru: "Убирайся", tip: "Звучит: Ged-out-of-here." }
+        ]
+      },
+      {
+        id: "L1S4", title: "Связная речь", isTest: false,
+        description: '<div class="diagram"><div class="diagram-text"><strong>Правило:</strong> Носители сливают слова в одно целое, некоторые звуки исчезают (элизия).</div></div>',
+        words: [
+          { en: "Take it off", ru: "Сними это", tip: "Звучит: Ta-ki-toff." },
+          { en: "Take it easy", ru: "Расслабься", tip: "Звучит: Ta-ki-tizi." },
+          { en: "Next day", ru: "Следующий день", tip: "Звучит: Neks day." },
+          { en: "Last time", ru: "В прошлый раз", tip: "Звучит: Las time." },
+          { en: "Because", ru: "Потому что", tip: "В быстрой речи: Cuz." },
+          { en: "Don't know", ru: "Не знаю", tip: "Звучит: Dunno." },
+          { en: "Give me", ru: "Дай мне", tip: "Звучит: Gimme." },
+          { en: "Let me", ru: "Позволь мне", tip: "Звучит: Lemme." },
+          { en: "What are you", ru: "Что ты…", tip: "Звучит: Wachu." },
+          { en: "Could you", ru: "Не могли бы вы", tip: "Звучит: Cud-ja." },
+          { en: "Would you", ru: "Не будете ли вы", tip: "Звучит: Wud-ja." },
+          { en: "Did you", ru: "Ты сделал…", tip: "Звучит: Did-ja." },
+          { en: "I want to", ru: "Я хочу", tip: "Звучит: I wanna." },
+          { en: "Going to", ru: "Собираюсь", tip: "Звучит: Gonna." },
+          { en: "Kind of", ru: "Типа", tip: "Звучит: Kinda." }
+        ]
+      },
+      {
+        id: "L1T", title: "📝 Тест", isTest: true,
+        quiz: [
+          { word: "Water", correct: "Звучит как «Wader» (с Д)", wrong: "Звучит как «Water» (с Т)" },
+          { word: "Think", correct: "Язык между зубами, без вибрации", wrong: "Язык за зубами, с вибрацией" },
+          { word: "This", correct: "Язык между зубами, голос вибрирует", wrong: "Язык за зубами, без вибрации" },
+          { word: "Take it off", correct: "Слова сливаются в «Ta-ki-toff»", wrong: "Каждое слово произносится отдельно" },
+          { word: "Next day", correct: "Звучит как «Neks day» (Т исчезает)", wrong: "Звучит как «Next day» (Т слышна)" },
+          { word: "Better", correct: "Звучит как «Beder» (T→D)", wrong: "Звучит как «Better» (четкая T)" },
+          { word: "Brother", correct: "Звук /ð/ (язык между зубами)", wrong: "Звук /z/ (язык за зубами)" },
+          { word: "Because", correct: "В быстрой речи звучит как «Cuz»", wrong: "В быстрой речи звучит как «Be-cuz»" },
+          { word: "I want to", correct: "Звучит как «I wanna»", wrong: "Звучит как «I want to»" },
+          { word: "City", correct: "Звучит как «Cidy» (Flap T)", wrong: "Звучит как «City» (с четкой T)" }
+        ]
+      }
+    ]
+  },
+  {
+    id: "level2", title: "Уровень 2", subtitle: "Гласные и губные: /r/, /æ/, фразовое ударение",
+    sections: [
+      {
+        id: "L2S1", title: "Звук /r/", isTest: false,
+        description: '<div class="diagram"><svg viewBox="0 0 140 90"><path d="M 20,40 Q 70,10 120,40" stroke="#3498db" stroke-width="4" fill="none"/><path d="M 30,70 Q 70,60 90,50 Q 100,40 110,45 Q 100,50 90,60 Q 60,75 30,80 Z" fill="#e74c3c" opacity="0.8"/><text x="85" y="30" font-size="9" fill="#c0392b">Кончик вверх, но не касается</text></svg><div class="diagram-text"><strong>Правило:</strong> Кончик языка поднят вверх, но <strong>не вибрирует</strong> и не касается нёба. В американском английском звук /r/ произносится всегда.</div></div>',
+        words: [
+          { en: "Red", ru: "Красный", tip: "Язык вверх, без вибрации." },
+          { en: "Run", ru: "Бежать", tip: "Язык вверх." },
+          { en: "Right", ru: "Правый", tip: "Язык вверх." },
+          { en: "Read", ru: "Читать", tip: "Язык вверх." },
+          { en: "Room", ru: "Комната", tip: "Язык вверх." },
+          { en: "Road", ru: "Дорога", tip: "Язык вверх." },
+          { en: "Radio", ru: "Радио", tip: "Язык вверх." },
+          { en: "Really", ru: "Действительно", tip: "Дважды язык вверх." },
+          { en: "Sorry", ru: "Извините", tip: "Язык вверх." },
+          { en: "Very", ru: "Очень", tip: "Язык вверх." },
+          { en: "Every", ru: "Каждый", tip: "Язык вверх." },
+          { en: "Carry", ru: "Нести", tip: "Язык вверх." },
+          { en: "Married", ru: "Женатый", tip: "Язык вверх." },
+          { en: "Arrive", ru: "Прибывать", tip: "Язык вверх." },
+          { en: "Around", ru: "Вокруг", tip: "Язык вверх." }
+        ]
+      },
+      {
+        id: "L2S2", title: "Звук /æ/", isTest: false,
+        description: '<div class="diagram"><svg viewBox="0 0 140 90"><path d="M 20,40 Q 70,10 120,40" stroke="#3498db" stroke-width="4" fill="none"/><path d="M 110,35 L 130,35 L 130,80 L 110,80 Z" fill="#fff" stroke="#bdc3c7"/><path d="M 30,75 Q 70,75 100,75 Q 105,80 95,85 Q 60,85 30,85 Z" fill="#e74c3c" opacity="0.8"/><text x="115" y="25" font-size="9" fill="#3498db">Рот широко</text></svg><div class="diagram-text"><strong>Правило:</strong> Рот <strong>широко открыт</strong>, язык лежит низко и плоско. Звук между русскими «э» и «а».</div></div>',
+        words: [
+          { en: "Cat", ru: "Кошка", tip: "Широко открыть рот." },
+          { en: "Bad", ru: "Плохой", tip: "Широкий рот." },
+          { en: "Sad", ru: "Грустный", tip: "Широкий рот." },
+          { en: "Man", ru: "Мужчина", tip: "Широкий рот." },
+          { en: "Hand", ru: "Рука", tip: "Широкий рот." },
+          { en: "Apple", ru: "Яблоко", tip: "Широкий рот." },
+          { en: "Black", ru: "Чёрный", tip: "Широкий рот." },
+          { en: "Happy", ru: "Счастливый", tip: "Широкий рот." },
+          { en: "Family", ru: "Семья", tip: "Широкий рот." },
+          { en: "Travel", ru: "Путешествие", tip: "Широкий рот." },
+          { en: "Thank", ru: "Спасибо", tip: "Широкий рот." },
+          { en: "Plan", ru: "План", tip: "Широкий рот." },
+          { en: "Animal", ru: "Животное", tip: "Широкий рот." },
+          { en: "Map", ru: "Карта", tip: "Широкий рот." },
+          { en: "Sandwich", ru: "Бутерброд", tip: "Широкий рот." }
+        ]
+      },
+      {
+        id: "L2S3", title: "Фразовое ударение", isTest: false,
+        description: '<div class="diagram"><div class="diagram-text"><strong>Правило:</strong> В английском предложении <strong>ударные</strong> слова (существительные, глаголы, прилагательные) выделяются громче, а служебные (артикли, предлоги) — «проглатываются».</div></div>',
+        words: [
+          { en: "I WANT to GO home", ru: "Я хочу пойти домой", tip: "Ударные: WANT, GO, HOME." },
+          { en: "He LIKES playing FOOTBALL", ru: "Он любит играть в футбол", tip: "Ударные: LIKES, FOOTBALL." },
+          { en: "She is a DOCTOR", ru: "Она врач", tip: "Ударное: DOCTOR." },
+          { en: "I DON'T know", ru: "Я не знаю", tip: "Ударное: DON'T." },
+          { en: "Can you HELP me?", ru: "Можешь помочь?", tip: "Ударное: HELP." },
+          { en: "It is VERY good", ru: "Это очень хорошо", tip: "Ударные: VERY, GOOD." },
+          { en: "We need to TALK", ru: "Нам нужно поговорить", tip: "Ударное: TALK." },
+          { en: "I have a NEW phone", ru: "У меня новый телефон", tip: "Ударные: NEW, PHONE." },
+          { en: "Do you LIKE it?", ru: "Тебе нравится?", tip: "Ударное: LIKE." },
+          { en: "I'm GOING to the SHOP", ru: "Я иду в магазин", tip: "Ударные: GOING, SHOP." },
+          { en: "That's a GOOD idea", ru: "Это хорошая идея", tip: "Ударные: GOOD, IDEA." },
+          { en: "I will CALL you later", ru: "Я позвоню позже", tip: "Ударные: CALL, LATER." },
+          { en: "It's NOT my problem", ru: "Это не моя проблема", tip: "Ударные: NOT, PROBLEM." },
+          { en: "She WANTS to go", ru: "Она хочет пойти", tip: "Ударные: WANTS, GO." },
+          { en: "He is a GOOD student", ru: "Он хороший студент", tip: "Ударные: GOOD, STUDENT." }
+        ]
+      },
+      {
+        id: "L2T", title: "📝 Тест", isTest: true,
+        quiz: [
+          { word: "Red", correct: "Язык вверх, без вибрации (американское R)", wrong: "Раскатистое русское Р" },
+          { word: "Cat", correct: "Рот широко открыт (звук /æ/)", wrong: "Рот почти закрыт (звук /e/)" },
+          { word: "I WANT to GO home", correct: "Ударные: WANT, GO", wrong: "Все слова с одинаковой силой" },
+          { word: "Really", correct: "Дважды язык вверх, без вибрации", wrong: "Раскатистое Р" },
+          { word: "Apple", correct: "Широкий рот (/æ/)", wrong: "Узкий рот (/e/)" },
+          { word: "He LIKES playing FOOTBALL", correct: "Ударные: LIKES, FOOTBALL", wrong: "Ударные: He, playing" },
+          { word: "Around", correct: "Язык вверх, без вибрации", wrong: "Раскатистое Р" },
+          { word: "Black", correct: "Широкий рот (/æ/)", wrong: "Узкий рот (/e/)" },
+          { word: "I DON'T know", correct: "Ударное: DON'T", wrong: "Ударное: know" },
+          { word: "Travel", correct: "Широкий рот (/æ/)", wrong: "Узкий рот (/e/)" }
+        ]
+      }
+    ]
+  },
+  {
+    id: "level3", title: "Уровень 3", subtitle: "Контрасты гласных: Ship/Sheep, звуки /w/ и /ŋ/",
+    sections: [
+      {
+        id: "L3S1", title: "Ship vs Sheep", isTest: false,
+        description: '<div class="diagram"><svg viewBox="0 0 140 90"><path d="M 20,40 Q 70,10 120,40" stroke="#3498db" stroke-width="4" fill="none"/><rect x="105" y="35" width="10" height="15" fill="#fff" stroke="#bdc3c7"/><path d="M 30,70 Q 80,40 100,50 Q 105,55 95,60 Q 60,60 30,80 Z" fill="#e74c3c" opacity="0.8"/><text x="85" y="30" font-size="10" fill="#e74c3c" font-weight="bold">/iː/ — высоко</text><path d="M 30,75 Q 70,70 95,70 Q 100,75 90,80 Q 60,80 30,85 Z" fill="#f39c12" opacity="0.8"/><text x="30" y="30" font-size="10" fill="#f39c12" font-weight="bold">/ɪ/ — низко</text></svg><div class="diagram-text"><strong>Правило:</strong> Для краткого /ɪ/ (Ship) язык лежит <strong>низко</strong> и расслаблен. Для долгого /iː/ (Sheep) язык <strong>высоко</strong> у нёба, а губы растянуты в улыбке.</div></div>',
+        words: [
+          { en: "Ship", ru: "Корабль (/ɪ/)", tip: "Краткий: расслабьте губы, язык низко." },
+          { en: "Sheep", ru: "Овца (/iː/)", tip: "Долгий: улыбнитесь, язык высоко." },
+          { en: "Fit", ru: "Подходить (/ɪ/)", tip: "Краткий." },
+          { en: "Feet", ru: "Ноги (/iː/)", tip: "Долгий." },
+          { en: "Bit", ru: "Кусочек (/ɪ/)", tip: "Краткий." },
+          { en: "Beat", ru: "Бить (/iː/)", tip: "Долгий." },
+          { en: "Sit", ru: "Сидеть (/ɪ/)", tip: "Краткий." },
+          { en: "Seat", ru: "Место (/iː/)", tip: "Долгий." },
+          { en: "Live", ru: "Жить (/ɪ/)", tip: "Краткий." },
+          { en: "Leave", ru: "Уходить (/iː/)", tip: "Долгий." },
+          { en: "Fill", ru: "Наполнять (/ɪ/)", tip: "Краткий." },
+          { en: "Feel", ru: "Чувствовать (/iː/)", tip: "Долгий." },
+          { en: "This", ru: "Это (/ɪ/)", tip: "Краткий." },
+          { en: "These", ru: "Эти (/iː/)", tip: "Долгий." },
+          { en: "Pill", ru: "Таблетка (/ɪ/)", tip: "Краткий." },
+          { en: "Peel", ru: "Кожура (/iː/)", tip: "Долгий." }
+        ]
+      },
+      {
+        id: "L3S2", title: "Звук /w/", isTest: false,
+        description: '<div class="diagram"><svg viewBox="0 0 140 90"><ellipse cx="110" cy="45" rx="12" ry="22" fill="#f1c40f" opacity="0.6"/><path d="M 30,60 Q 70,40 90,50" stroke="#e74c3c" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.8"/><text x="115" y="25" font-size="9" fill="#666">Губы</text><text x="45" y="40" font-size="9" fill="#c0392b">Язык сзади</text></svg><div class="diagram-text"><strong>Правило:</strong> Губы вытянуты в трубочку (как для поцелуя). Зубы не участвуют (не путать с русским «в»).</div></div>',
+        words: [
+          { en: "Water", ru: "Вода", tip: "Губы трубочкой." },
+          { en: "Work", ru: "Работа", tip: "Губы трубочкой." },
+          { en: "Word", ru: "Слово", tip: "Губы трубочкой." },
+          { en: "World", ru: "Мир", tip: "Губы трубочкой." },
+          { en: "Want", ru: "Хотеть", tip: "Губы трубочкой." },
+          { en: "Wait", ru: "Ждать", tip: "Губы трубочкой." },
+          { en: "Walk", ru: "Гулять", tip: "Губы трубочкой." },
+          { en: "Warm", ru: "Тёплый", tip: "Губы трубочкой." },
+          { en: "Swim", ru: "Плавать", tip: "Губы трубочкой." },
+          { en: "Sweet", ru: "Сладкий", tip: "Губы трубочкой." },
+          { en: "Quick", ru: "Быстрый", tip: "Губы трубочкой." },
+          { en: "Queen", ru: "Королева", tip: "Губы трубочкой." },
+          { en: "Question", ru: "Вопрос", tip: "Губы трубочкой." },
+          { en: "Window", ru: "Окно", tip: "Губы трубочкой." },
+          { en: "Flower", ru: "Цветок", tip: "Губы трубочкой." }
+        ]
+      },
+      {
+        id: "L3S3", title: "Носовой /ŋ/", isTest: false,
+        description: '<div class="diagram"><svg viewBox="0 0 140 90"><path d="M 20,40 Q 70,10 120,40" stroke="#3498db" stroke-width="4" fill="none"/><path d="M 90,40 Q 100,20 110,10" stroke="#2980b9" stroke-width="4" fill="none" stroke-dasharray="3,3"/><path d="M 30,70 Q 70,60 90,40 Q 95,45 85,55 Q 60,75 30,80 Z" fill="#e74c3c" opacity="0.8"/><text x="110" y="20" font-size="9" fill="#2980b9">Нос</text><text x="40" y="85" font-size="9" fill="#c0392b">Язык сзади</text></svg><div class="diagram-text"><strong>Правило:</strong> Задняя часть языка у мягкого нёба. Воздух идёт через нос (не добавляйте звук «г»).</div></div>',
+        words: [
+          { en: "Sing", ru: "Петь", tip: "Носовой звук, без «г»." },
+          { en: "Ring", ru: "Звонить", tip: "Носовой звук, без «г»." },
+          { en: "King", ru: "Король", tip: "Носовой звук, без «г»." },
+          { en: "Thing", ru: "Вещь", tip: "Носовой звук, без «г»." },
+          { en: "Morning", ru: "Утро", tip: "Носовой звук, без «г»." },
+          { en: "Evening", ru: "Вечер", tip: "Носовой звук, без «г»." },
+          { en: "Going", ru: "Идти", tip: "Носовой звук, без «г»." },
+          { en: "Doing", ru: "Делать", tip: "Носовой звук, без «г»." },
+          { en: "Eating", ru: "Есть", tip: "Носовой звук, без «г»." },
+          { en: "Sleeping", ru: "Спать", tip: "Носовой звук, без «г»." },
+          { en: "Long", ru: "Длинный", tip: "Носовой звук, без «г»." },
+          { en: "Strong", ru: "Сильный", tip: "Носовой звук, без «г»." },
+          { en: "Young", ru: "Молодой", tip: "Носовой звук, без «г»." },
+          { en: "Thanks", ru: "Спасибо", tip: "Носовой + межзубный." },
+          { en: "Language", ru: "Язык", tip: "Носовой звук." }
+        ]
+      },
+      {
+        id: "L3T", title: "📝 Тест", isTest: true,
+        quiz: [
+          { word: "Ship", correct: "Краткий звук /ɪ/", wrong: "Долгий звук /iː/" },
+          { word: "Sheep", correct: "Долгий звук /iː/", wrong: "Краткий звук /ɪ/" },
+          { word: "Water", correct: "Губы трубочкой, звук /w/", wrong: "Зубы и губы, звук /в/" },
+          { word: "Sing", correct: "Носовой звук /ŋ/ (без «г»)", wrong: "Звук /ŋg/ (с «г»)" },
+          { word: "Feel", correct: "Долгий звук /iː/", wrong: "Краткий звук /ɪ/" },
+          { word: "Fill", correct: "Краткий звук /ɪ/", wrong: "Долгий звук /iː/" },
+          { word: "World", correct: "Губы трубочкой, звук /w/", wrong: "Зубы и губы, звук /в/" },
+          { word: "King", correct: "Носовой звук /ŋ/ (без «г»)", wrong: "Звук /ŋg/ (с «г»)" },
+          { word: "These", correct: "Долгий звук /iː/", wrong: "Краткий звук /ɪ/" },
+          { word: "This", correct: "Краткий звук /ɪ/", wrong: "Долгий звук /iː/" }
+        ]
+      }
+    ]
+  },
+  {
+    id: "level4", title: "Уровень 4", subtitle: "R-окрашенные гласные: /ɜːr/, /h/, тёмный L",
+    sections: [
+      {
+        id: "L4S1", title: "Звук /ɜːr/ (Bird)", isTest: false,
+        description: '<div class="diagram"><svg viewBox="0 0 140 90"><path d="M 20,40 Q 70,10 120,40" stroke="#3498db" stroke-width="4" fill="none"/><path d="M 30,70 Q 70,50 90,40 Q 100,35 105,45 Q 95,55 80,60 Q 60,75 30,80 Z" fill="#e74c3c" opacity="0.8"/><text x="75" y="25" font-size="10" fill="#c0392b" font-weight="bold">Язык закручен назад</text></svg><div class="diagram-text"><strong>Правило:</strong> Это гибрид звука «ё» и «р». Язык оттянут назад, кончик поднят, но не вибрирует (как при американском /r/).</div></div>',
+        words: [
+          { en: "Bird", ru: "Птица", tip: "R-окрашенный звук." },
+          { en: "Girl", ru: "Девочка", tip: "R-окрашенный." },
+          { en: "Work", ru: "Работа", tip: "R-окрашенный." },
+          { en: "Word", ru: "Слово", tip: "R-окрашенный." },
+          { en: "World", ru: "Мир", tip: "R-окрашенный." },
+          { en: "First", ru: "Первый", tip: "R-окрашенный." },
+          { en: "Third", ru: "Третий", tip: "R-окрашенный." },
+          { en: "Learn", ru: "Учить", tip: "R-окрашенный." },
+          { en: "Heard", ru: "Слышал", tip: "R-окрашенный." },
+          { en: "Turn", ru: "Поворачивать", tip: "R-окрашенный." },
+          { en: "Nurse", ru: "Медсестра", tip: "R-окрашенный." },
+          { en: "Church", ru: "Церковь", tip: "R-окрашенный." },
+          { en: "Birthday", ru: "День рождения", tip: "R-окрашенный." },
+          { en: "Early", ru: "Рано", tip: "R-окрашенный." },
+          { en: "Perfect", ru: "Идеальный", tip: "R-окрашенный." }
+        ]
+      },
+      {
+        id: "L4S2", title: "Звук /h/", isTest: false,
+        description: '<div class="diagram"><svg viewBox="0 0 140 90"><path d="M 40,20 Q 20,50 40,80" stroke="#3498db" stroke-width="4" fill="none"/><path d="M 40,50 L 10,50" stroke="#e74c3c" stroke-width="3" stroke-dasharray="4,4" fill="none"/><text x="10" y="40" font-size="10" fill="#c0392b">Выдох</text><text x="50" y="50" font-size="10" fill="#3498db">Горло</text></svg><div class="diagram-text"><strong>Правило:</strong> Легкий выдох из горла. Не напрягайте горло и не добавляйте звук «х» (как в русском).</div></div>',
+        words: [
+          { en: "Hello", ru: "Привет", tip: "Легкий выдох." },
+          { en: "Help", ru: "Помощь", tip: "Легкий выдох." },
+          { en: "House", ru: "Дом", tip: "Легкий выдох." },
+          { en: "Home", ru: "Дом (место)", tip: "Легкий выдох." },
+          { en: "Happy", ru: "Счастливый", tip: "Легкий выдох." },
+          { en: "Hot", ru: "Горячий", tip: "Легкий выдох." },
+          { en: "Hand", ru: "Рука", tip: "Легкий выдох." },
+          { en: "Head", ru: "Голова", tip: "Легкий выдох." },
+          { en: "Hair", ru: "Волосы", tip: "Легкий выдох." },
+          { en: "Hope", ru: "Надежда", tip: "Легкий выдох." },
+          { en: "Hear", ru: "Слышать", tip: "Легкий выдох." },
+          { en: "Hard", ru: "Трудный", tip: "Легкий выдох." },
+          { en: "Hundred", ru: "Сто", tip: "Легкий выдох." },
+          { en: "Behind", ru: "Позади", tip: "Легкий выдох." },
+          { en: "Perhaps", ru: "Возможно", tip: "Легкий выдох." }
+        ]
+      },
+      {
+        id: "L4S3", title: "Твердый /l/ (Dark L)", isTest: false,
+        description: '<div class="diagram"><svg viewBox="0 0 140 90"><path d="M 20,40 Q 70,10 120,40" stroke="#3498db" stroke-width="4" fill="none"/><path d="M 30,70 Q 80,70 110,60 Q 115,65 105,70 Q 70,80 30,80 Z" fill="#e74c3c" opacity="0.8"/><text x="80" y="30" font-size="10" fill="#c0392b">Задняя часть напряжена</text></svg><div class="diagram-text"><strong>Правило:</strong> В конце слова звук /l/ звучит <strong>твердо</strong> (как «л» в слове «стол»). Не смягчайте его (не говорите «ль»).</div></div>',
+        words: [
+          { en: "Full", ru: "Полный", tip: "Твердый Л." },
+          { en: "Pull", ru: "Тянуть", tip: "Твердый Л." },
+          { en: "Milk", ru: "Молоко", tip: "Твердый Л." },
+          { en: "Well", ru: "Хорошо", tip: "Твердый Л." },
+          { en: "Tell", ru: "Рассказывать", tip: "Твердый Л." },
+          { en: "Small", ru: "Маленький", tip: "Твердый Л." },
+          { en: "Wall", ru: "Стена", tip: "Твердый Л." },
+          { en: "Ball", ru: "Мяч", tip: "Твердый Л." },
+          { en: "Cold", ru: "Холодный", tip: "Твердый Л." },
+          { en: "Old", ru: "Старый", tip: "Твердый Л." },
+          { en: "Film", ru: "Фильм", tip: "Твердый Л." },
+          { en: "Feel", ru: "Чувствовать", tip: "Твердый Л." },
+          { en: "Real", ru: "Реальный", tip: "Твердый Л." },
+          { en: "People", ru: "Люди", tip: "Твердый Л." },
+          { en: "Table", ru: "Стол", tip: "Твердый Л." }
+        ]
+      },
+      {
+        id: "L4T", title: "📝 Тест", isTest: true,
+        quiz: [
+          { word: "Bird", correct: "R-окрашенный звук /ɜːr/ (язык назад)", wrong: "Четкое русское «ё»" },
+          { word: "Hello", correct: "Легкий выдох, без напряжения", wrong: "Русское «х»" },
+          { word: "Full", correct: "Твердый /l/ (как в «стол»)", wrong: "Мягкий /l/ (как в «соль»)" },
+          { word: "Girl", correct: "R-окрашенный звук /ɜːr/", wrong: "Четкое «ё» + «р»" },
+          { word: "Help", correct: "Легкий выдох", wrong: "Русское «х»" },
+          { word: "Milk", correct: "Твердый /l/", wrong: "Мягкий /l/" },
+          { word: "Work", correct: "R-окрашенный звук /ɜːr/", wrong: "Русское «ё»" },
+          { word: "Happy", correct: "Легкий выдох", wrong: "Русское «х»" },
+          { word: "Well", correct: "Твердый /l/", wrong: "Мягкий /l/" },
+          { word: "First", correct: "R-окрашенный звук /ɜːr/", wrong: "Русское «ё»" }
+        ]
+      }
+    ]
+  },
+  {
+    id: "level5", title: "Уровень 5", subtitle: "Финал: Schwa, сложные сочетания, аффрикаты, Большой Тест",
+    sections: [
+      {
+        id: "L5S1", title: "Слабые формы (Schwa)", isTest: false,
+        description: '<div class="diagram"><svg viewBox="0 0 140 90"><path d="M 40,40 Q 70,30 100,40" stroke="#3498db" stroke-width="4" fill="none"/><path d="M 40,60 Q 70,50 100,60" stroke="#3498db" stroke-width="4" fill="none"/><text x="30" y="80" font-size="10" fill="#c0392b">Рот расслаблен, едва открыт</text></svg><div class="diagram-text"><strong>Правило:</strong> Безударные гласные в английском языке превращаются в короткий, расслабленный звук <strong>/ə/</strong> (шва). Это самый частый звук в языке!</div></div>',
+        words: [
+          { en: "Banana", ru: "Банан", tip: "Звучит как bə-NA-nə." },
+          { en: "Camera", ru: "Камера", tip: "Звучит как CA-mə-rə." },
+          { en: "About", ru: "Около", tip: "Звучит как ə-BOUT." },
+          { en: "Above", ru: "Выше", tip: "Звучит как ə-BOVE." },
+          { en: "Sofa", ru: "Диван", tip: "Звучит как SO-fə." },
+          { en: "Problem", ru: "Проблема", tip: "Звучит как PROB-ləm." },
+          { en: "Computer", ru: "Компьютер", tip: "Звучит как com-PU-tə." },
+          { en: "Family", ru: "Семья", tip: "Звучит как FAM-ə-ly." },
+          { en: "Together", ru: "Вместе", tip: "Звучит как tə-GE-ther." },
+          { en: "Important", ru: "Важный", tip: "Звучит как im-POR-tənt." },
+          { en: "Animal", ru: "Животное", tip: "Звучит как AN-ə-məl." },
+          { en: "Alive", ru: "Живой", tip: "Звучит как ə-LIVE." },
+          { en: "Awake", ru: "Проснувшийся", tip: "Звучит как ə-WAKE." },
+          { en: "Alone", ru: "Один", tip: "Звучит как ə-LONE." },
+          { en: "America", ru: "Америка", tip: "Звучит как ə-ME-ri-cə." }
+        ]
+      },
+      {
+        id: "L5S2", title: "Сложные сочетания", isTest: false,
+        description: '<div class="diagram"><svg viewBox="0 0 140 90"><text x="20" y="40" font-size="24" fill="#3498db">S</text><text x="50" y="40" font-size="24" fill="#3498db">T</text><text x="80" y="40" font-size="24" fill="#3498db">R</text><text x="20" y="70" font-size="12" fill="#c0392b">Без гласных между ними!</text></svg><div class="diagram-text"><strong>Правило:</strong> В английском согласные могут идти подряд (2, 3 и даже 4). Не добавляйте между ними гласные звуки (не говорите «ст<strong>о</strong>п»).</div></div>',
+        words: [
+          { en: "Strengths", ru: "Сильные стороны", tip: "/strɛŋθs/." },
+          { en: "Texts", ru: "Тексты", tip: "/teksts/." },
+          { en: "Asked", ru: "Спросил", tip: "/æskt/." },
+          { en: "Glimpsed", ru: "Увидел мельком", tip: "/ɡlɪmpst/." },
+          { en: "Twelfths", ru: "Двенадцатые", tip: "/twelfθs/." },
+          { en: "Crisps", ru: "Чипсы", tip: "/krɪsps/." },
+          { en: "Scratch", ru: "Царапать", tip: "/skrætʃ/." },
+          { en: "Splash", ru: "Брызгать", tip: "/splæʃ/." },
+          { en: "Spring", ru: "Весна", tip: "/sprɪŋ/." },
+          { en: "Scream", ru: "Кричать", tip: "/skriːm/." },
+          { en: "Explain", ru: "Объяснять", tip: "/ɪkˈspleɪn/." },
+          { en: "Extreme", ru: "Экстрим", tip: "/ɪkˈstriːm/." },
+          { en: "Sixths", ru: "Шестые", tip: "/sɪksθs/." },
+          { en: "Prompt", ru: "Быстрый", tip: "/prɒmpt/." },
+          { en: "Tempted", ru: "Соблазненный", tip: "/temptɪd/." }
+        ]
+      },
+      {
+        id: "L5S3", title: "Аффрикаты и аспирация", isTest: false,
+        description: '<div class="diagram"><svg viewBox="0 0 140 90"><path d="M 20,40 Q 70,10 120,40" stroke="#3498db" stroke-width="4" fill="none"/><path d="M 30,70 Q 70,60 90,50 Q 100,45 105,55 Q 90,65 60,75 Q 40,80 30,80 Z" fill="#e74c3c" opacity="0.8"/><text x="70" y="25" font-size="10" fill="#c0392b">Твердый «ч» / «п» с выдохом</text></svg><div class="diagram-text"><strong>Правило:</strong> <strong>Аффрикаты</strong> /tʃ/ (chair) и /dʒ/ (job) звучат твёрдо, без русского смягчения. <strong>Аспирация</strong>: /p/, /t/, /k/ в начале ударного слога произносятся с сильным выдохом (pen, top, cat).</div></div>',
+        words: [
+          { en: "Chair", ru: "Стул", tip: "Твердый «ч» /tʃ/, без смягчения." },
+          { en: "Cheese", ru: "Сыр", tip: "Твердый «ч»." },
+          { en: "Child", ru: "Ребёнок", tip: "Твердый «ч»." },
+          { en: "Job", ru: "Работа", tip: "Мягкий звонкий /dʒ/, как «дж»." },
+          { en: "Judge", ru: "Судья", tip: "Звонкий /dʒ/." },
+          { en: "Vision", ru: "Зрение", tip: "Мягкий звонкий «ж» /ʒ/." },
+          { en: "Pleasure", ru: "Удовольствие", tip: "Мягкий звонкий «ж»." },
+          { en: "Pen", ru: "Ручка", tip: "P с сильным выдохом (аспирация)." },
+          { en: "Top", ru: "Верх", tip: "T с выдохом." },
+          { en: "Cat", ru: "Кошка", tip: "K с выдохом." },
+          { en: "Park", ru: "Парк", tip: "P с выдохом." },
+          { en: "Time", ru: "Время", tip: "T с выдохом." },
+          { en: "Key", ru: "Ключ", tip: "K с выдохом." },
+          { en: "Paper", ru: "Бумага", tip: "Первый P с выдохом." },
+          { en: "Teacher", ru: "Учитель", tip: "T с выдохом + твердый «ч»." }
+        ]
+      },
+      {
+        id: "L5T", title: "📝 Большой Тест", isTest: true,
+        quiz: [
+          { word: "Think", correct: "Язык между зубами (межзубный)", wrong: "Язык за зубами (как русское «с»)" },
+          { word: "Water", correct: "Звучит как «Wader» (Flap T)", wrong: "Звучит как «Water» (четкая T)" },
+          { word: "Ship", correct: "Краткий звук /ɪ/", wrong: "Долгий звук /iː/" },
+          { word: "Sing", correct: "Носовой звук /ŋ/ (без «г»)", wrong: "Звук /ŋg/ (с «г»)" },
+          { word: "Bird", correct: "R-окрашенный /ɜːr/", wrong: "Четкое «ё»" },
+          { word: "Chair", correct: "Твердый «ч» /tʃ/", wrong: "Мягкий «ч»" },
+          { word: "Pen", correct: "С сильным выдохом (аспирация)", wrong: "Без выдоха" },
+          { word: "Red", correct: "Язык вверх, без вибрации", wrong: "Раскатистое «р»" },
+          { word: "Banana", correct: "Безударные гласные звучат как /ə/", wrong: "Все гласные четкие" },
+          { word: "Strengths", correct: "Согласные идут подряд без гласных", wrong: "Добавляем гласные между согласными" },
+          { word: "Because", correct: "В быстрой речи звучит как «Cuz»", wrong: "Всегда произносится полностью" },
+          { word: "Hello", correct: "Легкий выдох (звук /h/)", wrong: "Русское «х»" },
+          { word: "Full", correct: "Твердый /l/", wrong: "Мягкий /l/" },
+          { word: "Vision", correct: "Мягкий звонкий «ж» /ʒ/", wrong: "Твердый «ж»" },
+          { word: "Cat", correct: "Широкий рот (/æ/) + выдох на K", wrong: "Узкий рот (/e/), без выдоха" }
+        ]
+      }
+    ]
+  }
+];
+
+/* =====================================================================
+   СОСТОЯНИЕ + СОХРАНЕНИЕ ПРОГРЕССА
+   ===================================================================== */
+let currentLevel = 0;
+let currentSection = 0;
+const quizState = {};
+const LS_KEY = 'phonTrainerProgress_v6';
+
+function loadProgress() {
+    try {
+        const raw = localStorage.getItem(LS_KEY);
+        if (!raw) return;
+        const saved = JSON.parse(raw);
+        Object.keys(saved).forEach(id => { quizState[id] = saved[id]; });
+    } catch (e) {}
+}
+function saveProgress() {
+    try { localStorage.setItem(LS_KEY, JSON.stringify(quizState)); } catch (e) {}
+}
+
+const levelsEl = document.getElementById('levels-container');
+const tabsEl = document.getElementById('tabs-container');
+const contentEl = document.getElementById('content-container');
+
+/* =====================================================================
+   ОТРИСОВКА
+   ===================================================================== */
+function renderLevels() {
+    levelsEl.innerHTML = '';
+    ALL_LEVELS.forEach((lvl, i) => {
+        const b = document.createElement('button');
+        b.className = 'level-btn' + (i === currentLevel ? ' active' : '');
+        b.innerHTML = '<span class="lvl-num">' + (i+1) + '</span>' + lvl.title.replace('Уровень ', '');
+        b.title = lvl.subtitle;
+        b.onclick = () => { currentLevel = i; currentSection = 0; renderLevels(); renderTabs(); renderSection(); };
+        levelsEl.appendChild(b);
+    });
+}
+
+function renderTabs() {
+    tabsEl.innerHTML = '';
+    const lvl = ALL_LEVELS[currentLevel];
+    lvl.sections.forEach((sec, i) => {
+        let label = sec.title;
+        if (sec.isTest && quizState[sec.id] && quizState[sec.id].done) {
+            label += ' (' + quizState[sec.id].score + '/' + sec.quiz.length + ') ✓';
+        }
+        const b = document.createElement('button');
+        b.className = 'tab-btn' + (sec.isTest ? ' test-tab' : '') + (i === currentSection ? ' active' : '');
+        b.textContent = label;
+        b.onclick = () => { currentSection = i; renderTabs(); renderSection(); };
+        tabsEl.appendChild(b);
+    });
+}
+
+function renderSection() {
+    const lvl = ALL_LEVELS[currentLevel];
+    const sec = lvl.sections[currentSection];
+    contentEl.innerHTML = '';
+
+    const card = document.createElement('div');
+    card.className = 'card';
+    if (sec.isTest) card.style.borderLeftColor = '#27ae60';
+
+    if (sec.isTest) {
+        card.innerHTML = '<h2 style="color:#27ae60;">' + sec.title + '</h2>'
+            + '<div class="quiz-container" id="quiz-' + sec.id + '">'
+            + '<div class="quiz-word-row">'
+            +   '<div class="quiz-word" id="qw-' + sec.id + '">Загрузка...</div>'
+            + '</div>'
+            + '<div class="quiz-word-row">'
+            +   '<button class="btn-quiz-sound" id="qsb-' + sec.id + '" title="Прослушать слово">🔊 Слушать</button>'
+            +   '<button class="btn-quiz-sound slow" id="qsb-slow-' + sec.id + '" title="Прослушать медленно">🐢 Медленно</button>'
+            + '</div>'
+            + '<div class="quiz-counter" id="qc-' + sec.id + '"></div>'
+            + '<div class="quiz-hint">Выберите правильный вариант:</div>'
+            + '<div class="options" id="qo-' + sec.id + '"></div>'
+            + '<div class="quiz-score" id="qs-' + sec.id + '" style="display:none;"></div>'
+            + '<button class="btn-next" id="qn-' + sec.id + '">Следующий вопрос ➔</button>'
+            + '<div><button class="btn-restart" id="qr-' + sec.id + '">🔄 Пройти заново</button></div>'
+            + '</div>';
+        contentEl.appendChild(card);
+        if (!quizState[sec.id]) {
+            quizState[sec.id] = { q: 0, score: 0, answered: false, done: false };
+        }
+        document.getElementById('qn-' + sec.id).onclick = () => nextQuestion(sec.id, sec.quiz);
+        document.getElementById('qr-' + sec.id).onclick = () => restartQuiz(sec.id);
+        document.getElementById('qsb-' + sec.id).onclick = () => {
+            const st = quizState[sec.id];
+            if (st.q < sec.quiz.length) playAudio(sec.quiz[st.q].word, null, null, false);
+        };
+        document.getElementById('qsb-slow-' + sec.id).onclick = () => {
+            const st = quizState[sec.id];
+            if (st.q < sec.quiz.length) playAudio(sec.quiz[st.q].word, null, null, true);
+        };
+        loadQuestion(sec.id, sec.quiz);
+    } else {
+        const desc = document.createElement('div');
+        desc.innerHTML = sec.description;
+        card.appendChild(desc);
+
+        const grid = document.createElement('div');
+        grid.className = 'words-grid';
+        sec.words.forEach((word, idx) => {
+            const waveId = 'w-' + sec.id + '-' + idx;
+
+            const block = document.createElement('div');
+            block.className = 'example-block';
+
+            const head = document.createElement('div');
+            head.className = 'ex-header';
+            const en = document.createElement('div');
+            en.className = 'ex-en';
+            en.textContent = word.en;
+            en.onclick = () => playAudio(word.en, null, null, false);
+            const ru = document.createElement('div');
+            ru.className = 'ex-ru';
+            ru.textContent = word.ru;
+            head.appendChild(en);
+            head.appendChild(ru);
+
+            const btnRow = document.createElement('div');
+            btnRow.className = 'btn-row';
+
+            const btn = document.createElement('button');
+            btn.className = 'btn-sound';
+            btn.textContent = '🔊 Слушать';
+            btn.onclick = () => playAudio(word.en, waveId, btn, false);
+
+            const btnSlow = document.createElement('button');
+            btnSlow.className = 'btn-sound btn-slow';
+            btnSlow.textContent = '🐢 Медленно';
+            btnSlow.onclick = () => playAudio(word.en, waveId, btnSlow, true);
+
+            btnRow.appendChild(btn);
+            btnRow.appendChild(btnSlow);
+
+            const wave = document.createElement('div');
+            wave.className = 'wave-container';
+            wave.id = waveId;
+            for (let i = 0; i < 6; i++) {
+                const bar = document.createElement('div');
+                bar.className = 'bar';
+                wave.appendChild(bar);
+            }
+
+            const tip = document.createElement('div');
+            tip.className = 'ex-tip';
+            tip.textContent = '💡 ' + word.tip;
+
+            block.appendChild(head);
+            block.appendChild(btnRow);
+            block.appendChild(wave);
+            block.appendChild(tip);
+            grid.appendChild(block);
+        });
+        card.appendChild(grid);
+        contentEl.appendChild(card);
+    }
+}
+
+/* =====================================================================
+   АУДИО С СЕССИЙНЫМ ТОКЕНОМ — защита от race-условий
+   ===================================================================== */
+let audioSession = 0;           // <-- ФИКС: монотонный счётчик сессий
+let currentAudio = null;
+let currentUtterance = null;
+let currentWaveId = null;
+let currentBtn = null;
+
+function stopCurrentAudio() {
+    audioSession++;             // <-- ФИКС: убить все чужие коллбэки
+    if (currentAudio) { try { currentAudio.pause(); } catch (e) {} currentAudio = null; }
+    if ('speechSynthesis' in window) { try { speechSynthesis.cancel(); } catch (e) {} }
+    currentUtterance = null;
+    if (currentWaveId) {
+        const w = document.getElementById(currentWaveId);
+        if (w) w.classList.remove('active');
+        currentWaveId = null;
+    }
+    if (currentBtn) {
+        currentBtn.classList.remove('speaking');
+        currentBtn.disabled = false;
+        currentBtn = null;
+    }
+}
+
+function markStarted(waveId, btn) {
+    currentWaveId = waveId;
+    currentBtn = btn || null;
+    if (waveId) {
+        const w = document.getElementById(waveId);
+        if (w) w.classList.add('active');
+    }
+    if (btn) {
+        btn.classList.add('speaking');
+        btn.disabled = true;
+    }
+}
+
+function markFinished() {
+    if (currentWaveId) {
+        const w = document.getElementById(currentWaveId);
+        if (w) w.classList.remove('active');
+        currentWaveId = null;
+    }
+    if (currentBtn) {
+        currentBtn.classList.remove('speaking');
+        currentBtn.disabled = false;
+        currentBtn = null;
+    }
+}
+
+/* Попытка 1: Google TTS. currentAudio — ДО play(), все коллбэки — под live() */
+function tryGoogleTTS(text, slow, onSuccess, onFail, session) {
+    let url = 'https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=en-us&q=' + encodeURIComponent(text);
+    const audio = new Audio(url);
+    if (slow) {                       // ФИКС-СКОРОСТЬ: замедление на клиенте —
+        audio.playbackRate = 0.6;     // работает всегда, не зависит от сервера
+        try { audio.preservesPitch = true; } catch (e) {}
+        try { audio.mozPreservesPitch = true; } catch (e) {}
+        try { audio.webkitPreservesPitch = true; } catch (e) {}
+    }
+    let settled = false;
+    const live = () => session === audioSession;
+    currentAudio = audio;          // <-- ФИКС: стоп ловит и висящий промис
+    const timer = setTimeout(() => {
+        if (!settled) { settled = true; try { audio.pause(); } catch (e) {} if (live()) onFail(); }
+    }, 5000);
+    audio.onended = () => { if (!settled) { settled = true; clearTimeout(timer); if (live()) onSuccess(); } };
+    audio.onerror = () => { if (!settled) { settled = true; clearTimeout(timer); if (live()) onFail(); } };
+    audio.play().then(() => {
+        if (!settled) { settled = true; clearTimeout(timer); if (live()) onSuccess(); }
+    }).catch(() => {
+        if (!settled) { settled = true; clearTimeout(timer); if (live()) onFail(); }
+    });
+}
+
+/* Попытка 2: StreamElements */
+function tryStreamElements(text, slow, onSuccess, onFail, session) {
+    let url = 'https://api.streamelements.com/kappa/v2/speech?voice=Brian&text=' + encodeURIComponent(text);
+    const audio = new Audio(url);
+    if (slow) {                       // ФИКС-СКОРОСТЬ: browser-side замедление
+        audio.playbackRate = 0.6;
+        try { audio.preservesPitch = true; } catch (e) {}
+        try { audio.mozPreservesPitch = true; } catch (e) {}
+        try { audio.webkitPreservesPitch = true; } catch (e) {}
+    }
+    let settled = false;
+    const live = () => session === audioSession;
+    currentAudio = audio;          // <-- ФИКС
+    const timer = setTimeout(() => {
+        if (!settled) { settled = true; try { audio.pause(); } catch (e) {} if (live()) onFail(); }
+    }, 5000);
+    audio.onended = () => { if (!settled) { settled = true; clearTimeout(timer); if (live()) onSuccess(); } };
+    audio.onerror = () => { if (!settled) { settled = true; clearTimeout(timer); if (live()) onFail(); } };
+    audio.play().then(() => {
+        if (!settled) { settled = true; clearTimeout(timer); if (live()) onSuccess(); }
+    }).catch(() => {
+        if (!settled) { settled = true; clearTimeout(timer); if (live()) onFail(); }
+    });
+}
+
+/* Попытка 3: speechSynthesis */
+function trySpeechSynthesis(text, slow, onSuccess, onFail, session) {
+    if (!('speechSynthesis' in window)) { onFail(); return; }
+    const live = () => session === audioSession;
+    try {
+        const voices = speechSynthesis.getVoices();
+        const voice = voices.find(v => /en[-_]US/i.test(v.lang)) || voices.find(v => /^en/i.test(v.lang)) || null;
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'en-US';
+        if (voice) u.voice = voice;
+        u.rate = slow ? 0.55 : 0.9;
+        u.onend = () => { if (live()) onSuccess(); };
+        u.onerror = () => { if (live()) onFail(); };
+        currentUtterance = u;
+        speechSynthesis.speak(u);
+    } catch (e) { if (live()) onFail(); }
+}
+
+/* Каскад с сессийным токеном */
+function playAudio(text, waveId, btn, slow) {
+    stopCurrentAudio();              // инкрементирует audioSession
+    const session = audioSession;    // <-- ФИКС: зафиксировать сессию
+    markStarted(waveId, btn);
+
+    tryGoogleTTS(text, slow,
+        () => { if (session === audioSession) markFinished(); },
+        () => {
+            if (session !== audioSession) return;   // <-- ФИКС: не переходить, если сессия устарела
+            tryStreamElements(text, slow,
+                () => { if (session === audioSession) markFinished(); },
+                () => {
+                    if (session !== audioSession) return;
+                    trySpeechSynthesis(text, slow,
+                        () => { if (session === audioSession) markFinished(); },
+                        () => { if (session === audioSession) markFinished(); },
+                        session
+                    );
+                },
+                session
+            );
+        },
+        session
+    );
+}
+
+/* Предзагрузка голосов */
+if ('speechSynthesis' in window) {
+    speechSynthesis.onvoiceschanged = () => { speechSynthesis.getVoices(); };
+    speechSynthesis.getVoices();
+}
+
+/* =====================================================================
+   ТЕСТ
+   ===================================================================== */
+function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+function loadQuestion(sectionId, quizData) {
+    const st = quizState[sectionId];
+    const qw = document.getElementById('qw-' + sectionId);
+    const qo = document.getElementById('qo-' + sectionId);
+    const qs = document.getElementById('qs-' + sectionId);
+    const qn = document.getElementById('qn-' + sectionId);
+    const qc = document.getElementById('qc-' + sectionId);
+    if (!qw) return;
+
+    if (st.q >= quizData.length) {
+        qw.textContent = "Тест завершен!";
+        qc.textContent = '';
+        qo.innerHTML = '';
+        qn.style.display = 'none';
+        qs.style.display = 'block';
+        let txt = "Вы набрали " + st.score + " из " + quizData.length + ". ";
+        if (st.score === quizData.length) txt += "Идеально! Вы настоящий фонетист! 🎉";
+        else if (st.score > quizData.length / 2) txt += "Отличный результат! Осталось чуть-чуть. 💪";
+        else txt += "Стоит еще раз повторить теорию. 👀";
+        qs.innerHTML = '<span style="font-size:22px;">' + txt + '</span>';
+        return;
+    }
+
+    st.answered = false;
+    qn.style.display = 'none';
+    qs.style.display = 'none';
+    qc.textContent = 'Вопрос ' + (st.q + 1) + ' из ' + quizData.length;
+
+    const q = quizData[st.q];
+    qw.textContent = q.word;
+    const options = shuffle([q.correct, q.wrong]);
+    qo.innerHTML = '';
+    options.forEach(opt => {
+        const b = document.createElement('button');
+        b.className = 'option-btn';
+        b.textContent = opt;
+        b.onclick = () => checkAnswer(sectionId, quizData, b, opt, q.correct);
+        qo.appendChild(b);
+    });
+}
+
+function checkAnswer(sectionId, quizData, btn, selected, correct) {
+    const st = quizState[sectionId];
+    if (st.answered) return;
+    st.answered = true;
+
+    if (selected === correct) {
+        btn.classList.add('correct');
+        st.score++;
+    } else {
+        btn.classList.add('wrong');
+        document.querySelectorAll('#qo-' + sectionId + ' .option-btn').forEach(b => {
+            if (b.textContent === correct) b.classList.add('correct');
+        });
+    }
+
+    const qo = document.getElementById('qo-' + sectionId);
+    qo.querySelectorAll('.option-btn').forEach(b => { b.disabled = true; });
+    const qs = document.getElementById('qs-' + sectionId);
+    qs.style.display = 'block';
+    qs.textContent = 'Текущий счёт: ' + st.score + ' из ' + (st.q + 1);
+    const qn = document.getElementById('qn-' + sectionId);
+    qn.textContent = (st.q + 1 >= quizData.length) ? 'Показать результат ➔' : 'Следующий вопрос ➔';
+    qn.style.display = 'inline-block';
+    saveProgress();
+    renderTabs();
+}
+
+function nextQuestion(sectionId, quizData) {
+    const st = quizState[sectionId];
+    st.q++;
+    if (st.q >= quizData.length) st.done = true;
+    saveProgress();
+    loadQuestion(sectionId, quizData);
+    renderTabs();
+}
+
+function restartQuiz(sectionId) {
+    let found = null;
+    for (const lvl of ALL_LEVELS) {
+        found = lvl.sections.find(s => s.id === sectionId);
+        if (found) break;
+    }
+    if (!found || !found.quiz) return;
+    quizState[sectionId] = { q: 0, score: 0, answered: false, done: false };
+    saveProgress();
+    loadQuestion(sectionId, found.quiz);
+    renderTabs();
+}
+
+/* =====================================================================
+   СТАРТ
+   ===================================================================== */
+loadProgress();
+renderLevels();
+renderTabs();
+renderSection();
+</script>
+</body>
+</html>
