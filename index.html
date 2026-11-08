@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Фонетический тренажер — все уровни</title>
@@ -825,6 +826,13 @@ function trySpeechSynthesis(text, slow, onSuccess, onFail, session) {
 
 /* Каскад с сессийным токеном */
 function playAudio(text, waveId, btn, slow) {
+       if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData) {
+        window.Telegram.WebApp.sendData(JSON.stringify({
+            type: "word_heard",
+            level: currentLevel + 1,
+            word: text
+        }));
+    }
     stopCurrentAudio();              // инкрементирует audioSession
     const session = audioSession;    // <-- ФИКС: зафиксировать сессию
     markStarted(waveId, btn);
@@ -960,7 +968,8 @@ function restartQuiz(sectionId) {
 
 /* =====================================================================
    СТАРТ
-   ===================================================================== */
+   ===================================================================== */const tg = window.Telegram?.WebApp;
+if (tg) { tg.ready(); tg.expand(); tg.setHeaderColor('#1F3A5F'); tg.setBackgroundColor('#f0f2f5'); }
 loadProgress();
 renderLevels();
 renderTabs();
