@@ -47,7 +47,6 @@
     .btn-sound:disabled { opacity: 0.6; cursor: wait; }
     .btn-slow { background: #7f8c8d; }
     .btn-slow:hover { background: #5d6d6e; }
-    .btn-slow.speaking { background: #C0392B; }
     .btn-repeat { background: #e67e22; }
     .btn-repeat:hover { background: #d35400; }
     .wave-container { display: none; align-items: flex-end; gap: 3px; height: 20px; margin-top: 5px; }
@@ -283,10 +282,643 @@ const ALL_LEVELS = [
         ]
       }
     ]
-  },
-  {
+  },  {
     id: "level3", title: "Уровень 3", subtitle: "Контрасты гласных: Ship/Sheep, звуки /w/ и /ŋ/",
     sections: [
       {
         id: "L3S1", title: "Ship vs Sheep", isTest: false,
-        description: '<div class="diagram"><svg viewBox="0 0 140 90"><path d="M 20,40 Q 70,10 120,40" stroke="#
+        description: '<div class="diagram"><svg viewBox="0 0 140 90"><path d="M 20,40 Q 70,10 120,40" stroke="#3498db" stroke-width="4" fill="none"/><rect x="105" y="35" width="10" height="15" fill="#fff" stroke="#bdc3c7"/><path d="M 30,70 Q 80,40 100,50 Q 105,55 95,60 Q 60,60 30,80 Z" fill="#e74c3c" opacity="0.8"/><text x="85" y="30" font-size="10" fill="#e74c3c" font-weight="bold">/iː/ — высоко</text><path d="M 30,75 Q 70,70 95,70 Q 100,75 90,80 Q 60,80 30,85 Z" fill="#f39c12" opacity="0.8"/><text x="30" y="30" font-size="10" fill="#f39c12" font-weight="bold">/ɪ/ — низко</text></svg><div class="diagram-text"><strong>Правило:</strong> Для краткого /ɪ/ (Ship) язык лежит <strong>низко</strong> и расслаблен. Для долгого /iː/ (Sheep) язык <strong>высоко</strong> у нёба, а губы растянуты в улыбке.</div></div>',
+        words: [
+          { en: "Ship", ru: "Корабль (/ɪ/)", tip: "Краткий: расслабьте губы, язык низко." },
+          { en: "Sheep", ru: "Овца (/iː/)", tip: "Долгий: улыбнитесь, язык высоко." },
+          { en: "Fit", ru: "Подходить (/ɪ/)", tip: "Краткий." },
+          { en: "Feet", ru: "Ноги (/iː/)", tip: "Долгий." },
+          { en: "Bit", ru: "Кусочек (/ɪ/)", tip: "Краткий." },
+          { en: "Beat", ru: "Бить (/iː/)", tip: "Долгий." },
+          { en: "Sit", ru: "Сидеть (/ɪ/)", tip: "Краткий." },
+          { en: "Seat", ru: "Место (/iː/)", tip: "Долгий." },
+          { en: "Live", ru: "Жить (/ɪ/)", tip: "Краткий." },
+          { en: "Leave", ru: "Уходить (/iː/)", tip: "Долгий." },
+          { en: "Fill", ru: "Наполнять (/ɪ/)", tip: "Краткий." },
+          { en: "Feel", ru: "Чувствовать (/iː/)", tip: "Долгий." },
+          { en: "This", ru: "Это (/ɪ/)", tip: "Краткий." },
+          { en: "These", ru: "Эти (/iː/)", tip: "Долгий." },
+          { en: "Pill", ru: "Таблетка (/ɪ/)", tip: "Краткий." },
+          { en: "Peel", ru: "Кожура (/iː/)", tip: "Долгий." }
+        ]
+      },
+      {
+        id: "L3S2", title: "Звук /w/", isTest: false,
+        description: '<div class="diagram"><svg viewBox="0 0 140 90"><ellipse cx="110" cy="45" rx="12" ry="22" fill="#f1c40f" opacity="0.6"/><path d="M 30,60 Q 70,40 90,50" stroke="#e74c3c" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.8"/><text x="115" y="25" font-size="9" fill="#666">Губы</text><text x="45" y="40" font-size="9" fill="#c0392b">Язык сзади</text></svg><div class="diagram-text"><strong>Правило:</strong> Губы вытянуты в трубочку (как для поцелуя). Зубы не участвуют (не путать с русским «в»).</div></div>',
+        words: [
+          { en: "Water", ru: "Вода", tip: "Губы трубочкой." },
+          { en: "Work", ru: "Работа", tip: "Губы трубочкой." },
+          { en: "Word", ru: "Слово", tip: "Губы трубочкой." },
+          { en: "World", ru: "Мир", tip: "Губы трубочкой." },
+          { en: "Want", ru: "Хотеть", tip: "Губы трубочкой." },
+          { en: "Wait", ru: "Ждать", tip: "Губы трубочкой." },
+          { en: "Walk", ru: "Гулять", tip: "Губы трубочкой." },
+          { en: "Warm", ru: "Тёплый", tip: "Губы трубочкой." },
+          { en: "Swim", ru: "Плавать", tip: "Губы трубочкой." },
+          { en: "Sweet", ru: "Сладкий", tip: "Губы трубочкой." },
+          { en: "Quick", ru: "Быстрый", tip: "Губы трубочкой." },
+          { en: "Queen", ru: "Королева", tip: "Губы трубочкой." },
+          { en: "Question", ru: "Вопрос", tip: "Губы трубочкой." },
+          { en: "Window", ru: "Окно", tip: "Губы трубочкой." },
+          { en: "Flower", ru: "Цветок", tip: "Губы трубочкой." }
+        ]
+      },
+      {
+        id: "L3S3", title: "Носовой /ŋ/", isTest: false,
+        description: '<div class="diagram"><svg viewBox="0 0 140 90"><path d="M 20,40 Q 70,10 120,40" stroke="#3498db" stroke-width="4" fill="none"/><path d="M 90,40 Q 100,20 110,10" stroke="#2980b9" stroke-width="4" fill="none" stroke-dasharray="3,3"/><path d="M 30,70 Q 70,60 90,40 Q 95,45 85,55 Q 60,75 30,80 Z" fill="#e74c3c" opacity="0.8"/><text x="110" y="20" font-size="9" fill="#2980b9">Нос</text><text x="40" y="85" font-size="9" fill="#c0392b">Язык сзади</text></svg><div class="diagram-text"><strong>Правило:</strong> Задняя часть языка у мягкого нёба. Воздух идёт через нос (не добавляйте звук «г»).</div></div>',
+        words: [
+          { en: "Sing", ru: "Петь", tip: "Носовой звук, без «г»." },
+          { en: "Ring", ru: "Звонить", tip: "Носовой звук, без «г»." },
+          { en: "King", ru: "Король", tip: "Носовой звук, без «г»." },
+          { en: "Thing", ru: "Вещь", tip: "Носовой звук, без «г»." },
+          { en: "Morning", ru: "Утро", tip: "Носовой звук, без «г»." },
+          { en: "Evening", ru: "Вечер", tip: "Носовой звук, без «г»." },
+          { en: "Going", ru: "Идти", tip: "Носовой звук, без «г»." },
+          { en: "Doing", ru: "Делать", tip: "Носовой звук, без «г»." },
+          { en: "Eating", ru: "Есть", tip: "Носовой звук, без «г»." },
+          { en: "Sleeping", ru: "Спать", tip: "Носовой звук, без «г»." },
+          { en: "Long", ru: "Длинный", tip: "Носовой звук, без «г»." },
+          { en: "Strong", ru: "Сильный", tip: "Носовой звук, без «г»." },
+          { en: "Young", ru: "Молодой", tip: "Носовой звук, без «г»." },
+          { en: "Thanks", ru: "Спасибо", tip: "Носовой + межзубный." },
+          { en: "Language", ru: "Язык", tip: "Носовой звук." }
+        ]
+      },
+      {
+        id: "L3T", title: "📝 Тест", isTest: true,
+        quiz: [
+          { word: "Ship", correct: "Краткий звук /ɪ/", wrong: "Долгий звук /iː/" },
+          { word: "Sheep", correct: "Долгий звук /iː/", wrong: "Краткий звук /ɪ/" },
+          { word: "Water", correct: "Губы трубочкой, звук /w/", wrong: "Зубы и губы, звук /в/" },
+          { word: "Sing", correct: "Носовой звук /ŋ/ (без «г»)", wrong: "Звук /ŋg/ (с «г»)" },
+          { word: "Feel", correct: "Долгий звук /iː/", wrong: "Краткий звук /ɪ/" },
+          { word: "Fill", correct: "Краткий звук /ɪ/", wrong: "Долгий звук /iː/" },
+          { word: "World", correct: "Губы трубочкой, звук /w/", wrong: "Зубы и губы, звук /в/" },
+          { word: "King", correct: "Носовой звук /ŋ/ (без «г»)", wrong: "Звук /ŋg/ (с «г»)" },
+          { word: "These", correct: "Долгий звук /iː/", wrong: "Краткий звук /ɪ/" },
+          { word: "This", correct: "Краткий звук /ɪ/", wrong: "Долгий звук /iː/" }
+        ]
+      }
+    ]
+  },
+  {
+    id: "level4", title: "Уровень 4", subtitle: "R-окрашенные гласные: /ɜːr/, /h/, тёмный L",
+    sections: [
+      {
+        id: "L4S1", title: "Звук /ɜːr/ (Bird)", isTest: false,
+        description: '<div class="diagram"><svg viewBox="0 0 140 90"><path d="M 20,40 Q 70,10 120,40" stroke="#3498db" stroke-width="4" fill="none"/><path d="M 30,70 Q 70,50 90,40 Q 100,35 105,45 Q 95,55 80,60 Q 60,75 30,80 Z" fill="#e74c3c" opacity="0.8"/><text x="75" y="25" font-size="10" fill="#c0392b" font-weight="bold">Язык закручен назад</text></svg><div class="diagram-text"><strong>Правило:</strong> Это гибрид звука «ё» и «р». Язык оттянут назад, кончик поднят, но не вибрирует (как при американском /r/).</div></div>',
+        words: [
+          { en: "Bird", ru: "Птица", tip: "R-окрашенный звук." },
+          { en: "Girl", ru: "Девочка", tip: "R-окрашенный." },
+          { en: "Work", ru: "Работа", tip: "R-окрашенный." },
+          { en: "Word", ru: "Слово", tip: "R-окрашенный." },
+          { en: "World", ru: "Мир", tip: "R-окрашенный." },
+          { en: "First", ru: "Первый", tip: "R-окрашенный." },
+          { en: "Third", ru: "Третий", tip: "R-окрашенный." },
+          { en: "Learn", ru: "Учить", tip: "R-окрашенный." },
+          { en: "Heard", ru: "Слышал", tip: "R-окрашенный." },
+          { en: "Turn", ru: "Поворачивать", tip: "R-окрашенный." },
+          { en: "Nurse", ru: "Медсестра", tip: "R-окрашенный." },
+          { en: "Church", ru: "Церковь", tip: "R-окрашенный." },
+          { en: "Birthday", ru: "День рождения", tip: "R-окрашенный." },
+          { en: "Early", ru: "Рано", tip: "R-окрашенный." },
+          { en: "Perfect", ru: "Идеальный", tip: "R-окрашенный." }
+        ]
+      },
+      {
+        id: "L4S2", title: "Звук /h/", isTest: false,
+        description: '<div class="diagram"><svg viewBox="0 0 140 90"><path d="M 40,20 Q 20,50 40,80" stroke="#3498db" stroke-width="4" fill="none"/><path d="M 40,50 L 10,50" stroke="#e74c3c" stroke-width="3" stroke-dasharray="4,4" fill="none"/><text x="10" y="40" font-size="10" fill="#c0392b">Выдох</text><text x="50" y="50" font-size="10" fill="#3498db">Горло</text></svg><div class="diagram-text"><strong>Правило:</strong> Легкий выдох из горла. Не напрягайте горло и не добавляйте звук «х» (как в русском).</div></div>',
+        words: [
+          { en: "Hello", ru: "Привет", tip: "Легкий выдох." },
+          { en: "Help", ru: "Помощь", tip: "Легкий выдох." },
+          { en: "House", ru: "Дом", tip: "Легкий выдох." },
+          { en: "Home", ru: "Дом (место)", tip: "Легкий выдох." },
+          { en: "Happy", ru: "Счастливый", tip: "Легкий выдох." },
+          { en: "Hot", ru: "Горячий", tip: "Легкий выдох." },
+          { en: "Hand", ru: "Рука", tip: "Легкий выдох." },
+          { en: "Head", ru: "Голова", tip: "Легкий выдох." },
+          { en: "Hair", ru: "Волосы", tip: "Легкий выдох." },
+          { en: "Hope", ru: "Надежда", tip: "Легкий выдох." },
+          { en: "Hear", ru: "Слышать", tip: "Легкий выдох." },
+          { en: "Hard", ru: "Трудный", tip: "Легкий выдох." },
+          { en: "Hundred", ru: "Сто", tip: "Легкий выдох." },
+          { en: "Behind", ru: "Позади", tip: "Легкий выдох." },
+          { en: "Perhaps", ru: "Возможно", tip: "Легкий выдох." }
+        ]
+      },
+      {
+        id: "L4S3", title: "Твердый /l/ (Dark L)", isTest: false,
+        description: '<div class="diagram"><svg viewBox="0 0 140 90"><path d="M 20,40 Q 70,10 120,40" stroke="#3498db" stroke-width="4" fill="none"/><path d="M 30,70 Q 80,70 110,60 Q 115,65 105,70 Q 70,80 30,80 Z" fill="#e74c3c" opacity="0.8"/><text x="80" y="30" font-size="10" fill="#c0392b">Задняя часть напряжена</text></svg><div class="diagram-text"><strong>Правило:</strong> В конце слова звук /l/ звучит <strong>твердо</strong> (как «л» в слове «стол»). Не смягчайте его (не говорите «ль»).</div></div>',
+        words: [
+          { en: "Full", ru: "Полный", tip: "Твердый Л." },
+          { en: "Pull", ru: "Тянуть", tip: "Твердый Л." },
+          { en: "Milk", ru: "Молоко", tip: "Твердый Л." },
+          { en: "Well", ru: "Хорошо", tip: "Твердый Л." },
+          { en: "Tell", ru: "Рассказывать", tip: "Твердый Л." },
+          { en: "Small", ru: "Маленький", tip: "Твердый Л." },
+          { en: "Wall", ru: "Стена", tip: "Твердый Л." },
+          { en: "Ball", ru: "Мяч", tip: "Твердый Л." },
+          { en: "Cold", ru: "Холодный", tip: "Твердый Л." },
+          { en: "Old", ru: "Старый", tip: "Твердый Л." },
+          { en: "Film", ru: "Фильм", tip: "Твердый Л." },
+          { en: "Feel", ru: "Чувствовать", tip: "Твердый Л." },
+          { en: "Real", ru: "Реальный", tip: "Твердый Л." },
+          { en: "People", ru: "Люди", tip: "Твердый Л." },
+          { en: "Table", ru: "Стол", tip: "Твердый Л." }
+        ]
+      },
+      {
+        id: "L4T", title: "📝 Тест", isTest: true,
+        quiz: [
+          { word: "Bird", correct: "R-окрашенный звук /ɜːr/ (язык назад)", wrong: "Четкое русское «ё»" },
+          { word: "Hello", correct: "Легкий выдох, без напряжения", wrong: "Русское «х»" },
+          { word: "Full", correct: "Твердый /l/ (как в «стол»)", wrong: "Мягкий /l/ (как в «соль»)" },
+          { word: "Girl", correct: "R-окрашенный звук /ɜːr/", wrong: "Четкое «ё» + «р»" },
+          { word: "Help", correct: "Легкий выдох", wrong: "Русское «х»" },
+          { word: "Milk", correct: "Твердый /l/", wrong: "Мягкий /l/" },
+          { word: "Work", correct: "R-окрашенный звук /ɜːr/", wrong: "Русское «ё»" },
+          { word: "Happy", correct: "Легкий выдох", wrong: "Русское «х»" },
+          { word: "Well", correct: "Твердый /l/", wrong: "Мягкий /l/" },
+          { word: "First", correct: "R-окрашенный звук /ɜːr/", wrong: "Русское «ё»" }
+        ]
+      }
+    ]
+  },
+  {
+    id: "level5", title: "Уровень 5", subtitle: "Финал: Schwa, сложные сочетания, аффрикаты, Большой Тест",
+    sections: [
+      {
+        id: "L5S1", title: "Слабые формы (Schwa)", isTest: false,
+        description: '<div class="diagram"><svg viewBox="0 0 140 90"><path d="M 40,40 Q 70,30 100,40" stroke="#3498db" stroke-width="4" fill="none"/><path d="M 40,60 Q 70,50 100,60" stroke="#3498db" stroke-width="4" fill="none"/><text x="30" y="80" font-size="10" fill="#c0392b">Рот расслаблен, едва открыт</text></svg><div class="diagram-text"><strong>Правило:</strong> Безударные гласные в английском языке превращаются в короткий, расслабленный звук <strong>/ə/</strong> (шва). Это самый частый звук в языке!</div></div>',
+        words: [
+          { en: "Banana", ru: "Банан", tip: "Звучит как bə-NA-nə." },
+          { en: "Camera", ru: "Камера", tip: "Звучит как CA-mə-rə." },
+          { en: "About", ru: "Около", tip: "Звучит как ə-BOUT." },
+          { en: "Above", ru: "Выше", tip: "Звучит как ə-BOVE." },
+          { en: "Sofa", ru: "Диван", tip: "Звучит как SO-fə." },
+          { en: "Problem", ru: "Проблема", tip: "Звучит как PROB-ləm." },
+          { en: "Computer", ru: "Компьютер", tip: "Звучит как com-PU-tə." },
+          { en: "Family", ru: "Семья", tip: "Звучит как FAM-ə-ly." },
+          { en: "Together", ru: "Вместе", tip: "Звучит как tə-GE-ther." },
+          { en: "Important", ru: "Важный", tip: "Звучит как im-POR-tənt." },
+          { en: "Animal", ru: "Животное", tip: "Звучит как AN-ə-məl." },
+          { en: "Alive", ru: "Живой", tip: "Звучит как ə-LIVE." },
+          { en: "Awake", ru: "Проснувшийся", tip: "Звучит как ə-WAKE." },
+          { en: "Alone", ru: "Один", tip: "Звучит как ə-LONE." },
+          { en: "America", ru: "Америка", tip: "Звучит как ə-ME-ri-cə." }
+        ]
+      },
+      {
+        id: "L5S2", title: "Сложные сочетания", isTest: false,
+        description: '<div class="diagram"><svg viewBox="0 0 140 90"><text x="20" y="40" font-size="24" fill="#3498db">S</text><text x="50" y="40" font-size="24" fill="#3498db">T</text><text x="80" y="40" font-size="24" fill="#3498db">R</text><text x="20" y="70" font-size="12" fill="#c0392b">Без гласных между ними!</text></svg><div class="diagram-text"><strong>Правило:</strong> В английском согласные могут идти подряд (2, 3 и даже 4). Не добавляйте между ними гласные звуки (не говорите «ст<strong>о</strong>п»).</div></div>',
+        words: [
+          { en: "Strengths", ru: "Сильные стороны", tip: "/strɛŋθs/." },
+          { en: "Texts", ru: "Тексты", tip: "/teksts/." },
+          { en: "Asked", ru: "Спросил", tip: "/æskt/." },
+          { en: "Glimpsed", ru: "Увидел мельком", tip: "/ɡlɪmpst/." },
+          { en: "Twelfths", ru: "Двенадцатые", tip: "/twelfθs/." },
+          { en: "Crisps", ru: "Чипсы", tip: "/krɪsps/." },
+          { en: "Scratch", ru: "Царапать", tip: "/skrætʃ/." },
+          { en: "Splash", ru: "Брызгать", tip: "/splæʃ/." },
+          { en: "Spring", ru: "Весна", tip: "/sprɪŋ/." },
+          { en: "Scream", ru: "Кричать", tip: "/skriːm/." },
+          { en: "Explain", ru: "Объяснять", tip: "/ɪkˈspleɪn/." },
+          { en: "Extreme", ru: "Экстрим", tip: "/ɪkˈstriːm/." },
+          { en: "Sixths", ru: "Шестые", tip: "/sɪksθs/." },
+          { en: "Prompt", ru: "Быстрый", tip: "/prɒmpt/." },
+          { en: "Tempted", ru: "Соблазненный", tip: "/temptɪd/." }
+        ]
+      },
+      {
+        id: "L5S3", title: "Аффрикаты и аспирация", isTest: false,
+        description: '<div class="diagram"><svg viewBox="0 0 140 90"><path d="M 20,40 Q 70,10 120,40" stroke="#3498db" stroke-width="4" fill="none"/><path d="M 30,70 Q 70,60 90,50 Q 100,45 105,55 Q 90,65 60,75 Q 40,80 30,80 Z" fill="#e74c3c" opacity="0.8"/><text x="70" y="25" font-size="10" fill="#c0392b">Твердый «ч» / «п» с выдохом</text></svg><div class="diagram-text"><strong>Правило:</strong> <strong>Аффрикаты</strong> /tʃ/ (chair) и /dʒ/ (job) звучат твёрдо, без русского смягчения. <strong>Аспирация</strong>: /p/, /t/, /k/ в начале ударного слога произносятся с сильным выдохом (pen, top, cat).</div></div>',
+        words: [
+          { en: "Chair", ru: "Стул", tip: "Твердый «ч» /tʃ/, без смягчения." },
+          { en: "Cheese", ru: "Сыр", tip: "Твердый «ч»." },
+          { en: "Child", ru: "Ребёнок", tip: "Твердый «ч»." },
+          { en: "Job", ru: "Работа", tip: "Мягкий звонкий /dʒ/, как «дж»." },
+          { en: "Judge", ru: "Судья", tip: "Звонкий /dʒ/." },
+          { en: "Vision", ru: "Зрение", tip: "Мягкий звонкий «ж» /ʒ/." },
+          { en: "Pleasure", ru: "Удовольствие", tip: "Мягкий звонкий «ж»." },
+          { en: "Pen", ru: "Ручка", tip: "P с сильным выдохом (аспирация)." },
+          { en: "Top", ru: "Верх", tip: "T с выдохом." },
+          { en: "Cat", ru: "Кошка", tip: "K с выдохом." },
+          { en: "Park", ru: "Парк", tip: "P с выдохом." },
+          { en: "Time", ru: "Время", tip: "T с выдохом." },
+          { en: "Key", ru: "Ключ", tip: "K с выдохом." },
+          { en: "Paper", ru: "Бумага", tip: "Первый P с выдохом." },
+          { en: "Teacher", ru: "Учитель", tip: "T с выдохом + твердый «ч»." }
+        ]
+      },
+      {
+        id: "L5T", title: "📝 Большой Тест", isTest: true,
+        quiz: [
+          { word: "Think", correct: "Язык между зубами (межзубный)", wrong: "Язык за зубами (как русское «с»)" },
+          { word: "Water", correct: "Звучит как «Wader» (Flap T)", wrong: "Звучит как «Water» (четкая T)" },
+          { word: "Ship", correct: "Краткий звук /ɪ/", wrong: "Долгий звук /iː/" },
+          { word: "Sing", correct: "Носовой звук /ŋ/ (без «г»)", wrong: "Звук /ŋg/ (с «г»)" },
+          { word: "Bird", correct: "R-окрашенный /ɜːr/", wrong: "Четкое «ё»" },
+          { word: "Chair", correct: "Твердый «ч» /tʃ/", wrong: "Мягкий «ч»" },
+          { word: "Pen", correct: "С сильным выдохом (аспирация)", wrong: "Без выдоха" },
+          { word: "Red", correct: "Язык вверх, без вибрации", wrong: "Раскатистое «р»" },
+          { word: "Banana", correct: "Безударные гласные звучат как /ə/", wrong: "Все гласные четкие" },
+          { word: "Strengths", correct: "Согласные идут подряд без гласных", wrong: "Добавляем гласные между согласными" },
+          { word: "Because", correct: "В быстрой речи звучит как «Cuz»", wrong: "Всегда произносится полностью" },
+          { word: "Hello", correct: "Легкий выдох (звук /h/)", wrong: "Русское «х»" },
+          { word: "Full", correct: "Твердый /l/", wrong: "Мягкий /l/" },
+          { word: "Vision", correct: "Мягкий звонкий «ж» /ʒ/", wrong: "Твердый «ж»" },
+          { word: "Cat", correct: "Широкий рот (/æ/) + выдох на K", wrong: "Узкий рот (/e/), без выдоха" }
+        ]
+      }
+    ]
+  }
+];
+
+/* =====================================================================
+   СОСТОЯНИЕ + СОХРАНЕНИЕ ПРОГРЕССА
+   ===================================================================== */
+let currentLevel = 0;
+let currentSection = 0;
+const quizState = {};
+const LS_KEY = 'phonTrainerProgress_v6';
+
+function loadProgress() {
+    try {
+        const raw = localStorage.getItem(LS_KEY);
+        if (!raw) return;
+        const saved = JSON.parse(raw);
+        Object.keys(saved).forEach(id => { quizState[id] = saved[id]; });
+    } catch (e) {}
+}
+function saveProgress() {
+    try { localStorage.setItem(LS_KEY, JSON.stringify(quizState)); } catch (e) {}
+}
+
+const levelsEl = document.getElementById('levels-container');
+const tabsEl = document.getElementById('tabs-container');
+const contentEl = document.getElementById('content-container');
+
+/* =====================================================================
+   ОТРИСОВКА
+   ===================================================================== */
+function renderLevels() {
+    levelsEl.innerHTML = '';
+    ALL_LEVELS.forEach((lvl, i) => {
+        const b = document.createElement('button');
+        b.className = 'level-btn' + (i === currentLevel ? ' active' : '');
+        b.innerHTML = '<span class="lvl-num">' + (i+1) + '</span>' + lvl.title.replace('Уровень ', '');
+        b.title = lvl.subtitle;
+        b.onclick = () => { currentLevel = i; currentSection = 0; renderLevels(); renderTabs(); renderSection(); };
+        levelsEl.appendChild(b);
+    });
+}
+
+function renderTabs() {
+    tabsEl.innerHTML = '';
+    const lvl = ALL_LEVELS[currentLevel];
+    lvl.sections.forEach((sec, i) => {
+        let label = sec.title;
+        if (sec.isTest && quizState[sec.id] && quizState[sec.id].done) {
+            label += ' (' + quizState[sec.id].score + '/' + sec.quiz.length + ') ✓';
+        }
+        const b = document.createElement('button');
+        b.className = 'tab-btn' + (sec.isTest ? ' test-tab' : '') + (i === currentSection ? ' active' : '');
+        b.textContent = label;
+        b.onclick = () => { currentSection = i; renderTabs(); renderSection(); };
+        tabsEl.appendChild(b);
+    });
+}function renderSection() {
+    const lvl = ALL_LEVELS[currentLevel];
+    const sec = lvl.sections[currentSection];
+    contentEl.innerHTML = '';
+
+    const card = document.createElement('div');
+    card.className = 'card';
+    if (sec.isTest) card.style.borderLeftColor = '#27ae60';
+
+    if (sec.isTest) {
+        card.innerHTML = '<h2 style="color:#27ae60;">' + sec.title + '</h2>'
+            + '<div class="quiz-container" id="quiz-' + sec.id + '">'
+            + '<div class="quiz-word-row">'
+            +   '<div class="quiz-word" id="qw-' + sec.id + '">Загрузка...</div>'
+            + '</div>'
+            + '<div class="quiz-word-row">'
+            +   '<button class="btn-quiz-sound" id="qsb-' + sec.id + '">🔊 Слушать</button>'
+            +   '<button class="btn-quiz-sound slow" id="qsb-slow-' + sec.id + '">🐢 Медленно</button>'
+            + '</div>'
+            + '<div class="quiz-counter" id="qc-' + sec.id + '"></div>'
+            + '<div class="quiz-hint">Выберите правильный вариант:</div>'
+            + '<div class="options" id="qo-' + sec.id + '"></div>'
+            + '<div class="quiz-score" id="qs-' + sec.id + '" style="display:none;"></div>'
+            + '<button class="btn-next" id="qn-' + sec.id + '">Следующий вопрос ➔</button>'
+            + '<div><button class="btn-restart" id="qr-' + sec.id + '">🔄 Пройти заново</button></div>'
+            + '</div>';
+        contentEl.appendChild(card);
+        if (!quizState[sec.id]) {
+            quizState[sec.id] = { q: 0, score: 0, answered: false, done: false };
+        }
+        document.getElementById('qn-' + sec.id).onclick = () => nextQuestion(sec.id, sec.quiz);
+        document.getElementById('qr-' + sec.id).onclick = () => restartQuiz(sec.id);
+        document.getElementById('qsb-' + sec.id).onclick = () => {
+            const st = quizState[sec.id];
+            if (st.q < sec.quiz.length) playAudio(sec.quiz[st.q].word, null, null, false);
+        };
+        document.getElementById('qsb-slow-' + sec.id).onclick = () => {
+            const st = quizState[sec.id];
+            if (st.q < sec.quiz.length) playAudio(sec.quiz[st.q].word, null, null, true);
+        };
+        loadQuestion(sec.id, sec.quiz);
+    } else {
+        let wordsHtml = '';
+        sec.words.forEach((word, idx) => {
+            const waveId = 'w-' + sec.id + '-' + idx;
+            wordsHtml += '<div class="example-block">'
+                + '<div class="ex-header"><div class="ex-en">' + word.en + '</div><div class="ex-ru">' + word.ru + '</div></div>'
+                + '<div class="ex-tip">' + word.tip + '</div>'
+                + '<div class="btn-row">'
+                + '<button class="btn-sound" onclick="playAudio(\'' + escapeJs(word.en) + '\', \'' + waveId + '\', this, false)">🔊 Слушать</button>'
+                + '<button class="btn-sound btn-slow" onclick="playAudio(\'' + escapeJs(word.en) + '\', \'' + waveId + '\', this, true)">🐢 Медленно</button>'
+                + '<button class="btn-sound btn-repeat" onclick="requestVoice(\'' + escapeJs(word.en) + '\')">🎤 Повторить</button>'
+                + '</div>'
+                + '<div class="wave-container" id="' + waveId + '"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>'
+                + '</div>';
+        });
+        card.innerHTML = '<h2>' + sec.title + '</h2>' + sec.description + '<div class="words-grid">' + wordsHtml + '</div>';
+        contentEl.appendChild(card);
+    }
+}function requestVoice(word) {
+    if (window.Telegram && window.Telegram.WebApp) {
+        window.Telegram.WebApp.sendData(JSON.stringify({
+            type: "request_pronunciation",
+            word: word
+        }));
+        window.Telegram.WebApp.close();
+    }
+}          { word: "Travel", correct: "Широкий рот (/æ/)", wrong: "Узкий рот (/e/)" }
+        ]
+      }
+    ]
+  },  {
+    id: "level3", title: "Уровень 3", subtitle: "Контрасты гласных: Ship/Sheep, звуки /w/ и /ŋ/",
+    sections: [
+      {
+        id: "L3S1", title: "Ship vs Sheep", isTest: false,
+        description: '<div class="diagram"><svg viewBox="0 0 140 90"><path d="M 20,40 Q 70,10 120,40" stroke="#3498db" stroke-width="4" fill="none"/><rect x="105" y="35" width="10" height="15" fill="#fff" stroke="#bdc3c7"/><path d="M 30,70 Q 80,40 100,50 Q 105,55 95,60 Q 60,60 30,80 Z" fill="#e74c3c" opacity="0.8"/><text x="85" y="30" font-size="10" fill="#e74c3c" font-weight="bold">/iː/ — высоко</text><path d="M 30,75 Q 70,70 95,70 Q 100,75 90,80 Q 60,80 30,85 Z" fill="#f39c12" opacity="0.8"/><text x="30" y="30" font-size="10" fill="#f39c12" font-weight="bold">/ɪ/ — низко</text></svg><div class="diagram-text"><strong>Правило:</strong> Для краткого /ɪ/ (Ship) язык лежит <strong>низко</strong> и расслаблен. Для долгого /iː/ (Sheep) язык <strong>высоко</strong> у нёба, а губы растянуты в улыбке.</div></div>',
+        words: [
+          { en: "Ship", ru: "Корабль (/ɪ/)", tip: "Краткий: расслабьте губы, язык низко." },
+          { en: "Sheep", ru: "Овца (/iː/)", tip: "Долгий: улыбнитесь, язык высоко." },
+          { en: "Fit", ru: "Подходить (/ɪ/)", tip: "Краткий." },
+          { en: "Feet", ru: "Ноги (/iː/)", tip: "Долгий." },
+          { en: "Bit", ru: "Кусочек (/ɪ/)", tip: "Краткий." },
+          { en: "Beat", ru: "Бить (/iː/)", tip: "Долгий." },
+          { en: "Sit", ru: "Сидеть (/ɪ/)", tip: "Краткий." },
+          { en: "Seat", ru: "Место (/iː/)", tip: "Долгий." },
+          { en: "Live", ru: "Жить (/ɪ/)", tip: "Краткий." },
+          { en: "Leave", ru: "Уходить (/iː/)", tip: "Долгий." },
+          { en: "Fill", ru: "Наполнять (/ɪ/)", tip: "Краткий." },
+          { en: "Feel", ru: "Чувствовать (/iː/)", tip: "Долгий." },
+          { en: "This", ru: "Это (/ɪ/)", tip: "Краткий." },
+          { en: "These", ru: "Эти (/iː/)", tip: "Долгий." },
+          { en: "Pill", ru: "Таблетка (/ɪ/)", tip: "Краткий." },
+          { en: "Peel", ru: "Кожура (/iː/)", tip: "Долгий." }
+        ]
+      },
+      {
+        id: "L3S2", title: "Звук /w/", isTest: false,
+        description: '<div class="diagram"><svg viewBox="0 0 140 90"><ellipse cx="110" cy="45" rx="12" ry="22" fill="#f1c40f" opacity="0.6"/><path d="M 30,60 Q 70,40 90,50" stroke="#e74c3c" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.8"/><text x="115" y="25" font-size="9" fill="#666">Губы</text><text x="45" y="40" font-size="9" fill="#c0392b">Язык сзади</text></svg><div class="diagram-text"><strong>Правило:</strong> Губы вытянуты в трубочку (как для поцелуя). Зубы не участвуют (не путать с русским «в»).</div></div>',
+        words: [
+          { en: "Water", ru: "Вода", tip: "Губы трубочкой." },
+          { en: "Work", ru: "Работа", tip: "Губы трубочкой." },
+          { en: "Word", ru: "Слово", tip: "Губы трубочкой." },
+          { en: "World", ru: "Мир", tip: "Губы трубочкой." },
+          { en: "Want", ru: "Хотеть", tip: "Губы трубочкой." },
+          { en: "Wait", ru: "Ждать", tip: "Губы трубочкой." },
+          { en: "Walk", ru: "Гулять", tip: "Губы трубочкой." },
+          { en: "Warm", ru: "Тёплый", tip: "Губы трубочкой." },
+          { en: "Swim", ru: "Плавать", tip: "Губы трубочкой." },
+          { en: "Sweet", ru: "Сладкий", tip: "Губы трубочкой." },
+          { en: "Quick", ru: "Быстрый", tip: "Губы трубочкой." },
+          { en: "Queen", ru: "Королева", tip: "Губы трубочкой." },
+          { en: "Question", ru: "Вопрос", tip: "Губы трубочкой." },
+          { en: "Window", ru: "Окно", tip: "Губы трубочкой." },
+          { en: "Flower", ru: "Цветок", tip: "Губы трубочкой." }
+        ]
+      },
+      {
+        id: "L3S3", title: "Носовой /ŋ/", isTest: false,
+        description: '<div class="diagram"><svg viewBox="0 0 140 90"><path d="M 20,40 Q 70,10 120,40" stroke="#3498db" stroke-width="4" fill="none"/><path d="M 90,40 Q 100,20 110,10" stroke="#2980b9" stroke-width="4" fill="none" stroke-dasharray="3,3"/><path d="M 30,70 Q 70,60 90,40 Q 95,45 85,55 Q 60,75 30,80 Z" fill="#e74c3c" opacity="0.8"/><text x="110" y="20" font-size="9" fill="#2980b9">Нос</text><text x="40" y="85" font-size="9" fill="#c0392b">Язык сзади</text></svg><div class="diagram-text"><strong>Правило:</strong> Задняя часть языка у мягкого нёба. Воздух идёт через нос (не добавляйте звук «г»).</div></div>',
+        words: [
+          { en: "Sing", ru: "Петь", tip: "Носовой звук, без «г»." },
+          { en: "Ring", ru: "Звонить", tip: "Носовой звук, без «г»." },
+          { en: "King", ru: "Король", tip: "Носовой звук, без «г»." },
+          { en: "Thing", ru: "Вещь", tip: "Носовой звук, без «г»." },
+          { en: "Morning", ru: "Утро", tip: "Носовой звук, без «г»." },
+          { en: "Evening", ru: "Вечер", tip: "Носовой звук, без «г»." },
+          { en: "Going", ru: "Идти", tip: "Носовой звук, без «г»." },
+          { en: "Doing", ru: "Делать", tip: "Носовой звук, без «г»." },
+          { en: "Eating", ru: "Есть", tip: "Носовой звук, без «г»." },
+          { en: "Sleeping", ru: "Спать", tip: "Носовой звук, без «г»." },
+          { en: "Long", ru: "Длинный", tip: "Носовой звук, без «г»." },
+          { en: "Strong", ru: "Сильный", tip: "Носовой звук, без «г»." },
+          { en: "Young", ru: "Молодой", tip: "Носовой звук, без «г»." },
+          { en: "Thanks", ru: "Спасибо", tip: "Носовой + межзубный." },
+          { en: "Language", ru: "Язык", tip: "Носовой звук." }
+        ]
+      },
+      {
+        id: "L3T", title: "📝 Тест", isTest: true,
+        quiz: [
+          { word: "Ship", correct: "Краткий звук /ɪ/", wrong: "Долгий звук /iː/" },
+          { word: "Sheep", correct: "Долгий звук /iː/", wrong: "Краткий звук /ɪ/" },
+          { word: "Water", correct: "Губы трубочкой, звук /w/", wrong: "Зубы и губы, звук /в/" },
+          { word: "Sing", correct: "Носовой звук /ŋ/ (без «г»)", wrong: "Звук /ŋg/ (с «г»)" },
+          { word: "Feel", correct: "Долгий звук /iː/", wrong: "Краткий звук /ɪ/" },
+          { word: "Fill", correct: "Краткий звук /ɪ/", wrong: "Долгий звук /iː/" },
+          { word: "World", correct: "Губы трубочкой, звук /w/", wrong: "Зубы и губы, звук /в/" },
+          { word: "King", correct: "Носовой звук /ŋ/ (без «г»)", wrong: "Звук /ŋg/ (с «г»)" },
+          { word: "These", correct: "Долгий звук /iː/", wrong: "Краткий звук /ɪ/" },
+          { word: "This", correct: "Краткий звук /ɪ/", wrong: "Долгий звук /iː/" }
+        ]
+      }
+    ]
+  },
+  {
+    id: "level4", title: "Уровень 4", subtitle: "R-окрашенные гласные: /ɜːr/, /h/, тёмный L",
+    sections: [
+      {
+        id: "L4S1", title: "Звук /ɜːr/ (Bird)", isTest: false,
+        description: '<div class="diagram"><svg viewBox="0 0 140 90"><path d="M 20,40 Q 70,10 120,40" stroke="#3498db" stroke-width="4" fill="none"/><path d="M 30,70 Q 70,50 90,40 Q 100,35 105,45 Q 95,55 80,60 Q 60,75 30,80 Z" fill="#e74c3c" opacity="0.8"/><text x="75" y="25" font-size="10" fill="#c0392b" font-weight="bold">Язык закручен назад</text></svg><div class="diagram-text"><strong>Правило:</strong> Это гибрид звука «ё» и «р». Язык оттянут назад, кончик поднят, но не вибрирует (как при американском /r/).</div></div>',
+        words: [
+          { en: "Bird", ru: "Птица", tip: "R-окрашенный звук." },
+          { en: "Girl", ru: "Девочка", tip: "R-окрашенный." },
+          { en: "Work", ru: "Работа", tip: "R-окрашенный." },
+          { en: "Word", ru: "Слово", tip: "R-окрашенный." },
+          { en: "World", ru: "Мир", tip: "R-окрашенный." },
+          { en: "First", ru: "Первый", tip: "R-окрашенный." },
+          { en: "Third", ru: "Третий", tip: "R-окрашенный." },
+          { en: "Learn", ru: "Учить", tip: "R-окрашенный." },
+          { en: "Heard", ru: "Слышал", tip: "R-окрашенный." },
+          { en: "Turn", ru: "Поворачивать", tip: "R-окрашенный." },
+          { en: "Nurse", ru: "Медсестра", tip: "R-окрашенный." },
+          { en: "Church", ru: "Церковь", tip: "R-окрашенный." },
+          { en: "Birthday", ru: "День рождения", tip: "R-окрашенный." },
+          { en: "Early", ru: "Рано", tip: "R-окрашенный." },
+          { en: "Perfect", ru: "Идеальный", tip: "R-окрашенный." }
+        ]
+      },
+      {
+        id: "L4S2", title: "Звук /h/", isTest: false,
+        description: '<div class="diagram"><svg viewBox="0 0 140 90"><path d="M 40,20 Q 20,50 40,80" stroke="#3498db" stroke-width="4" fill="none"/><path d="M 40,50 L 10,50" stroke="#e74c3c" stroke-width="3" stroke-dasharray="4,4" fill="none"/><text x="10" y="40" font-size="10" fill="#c0392b">Выдох</text><text x="50" y="50" font-size="10" fill="#3498db">Горло</text></svg><div class="diagram-text"><strong>Правило:</strong> Легкий выдох из горла. Не напрягайте горло и не добавляйте звук «х» (как в русском).</div></div>',
+        words: [
+          { en: "Hello", ru: "Привет", tip: "Легкий выдох." },
+          { en: "Help", ru: "Помощь", tip: "Легкий выдох." },
+          { en: "House", ru: "Дом", tip: "Легкий выдох." },
+          { en: "Home", ru: "Дом (место)", tip: "Легкий выдох." },
+          { en: "Happy", ru: "Счастливый", tip: "Легкий выдох." },
+          { en: "Hot", ru: "Горячий", tip: "Легкий выдох." },
+          { en: "Hand", ru: "Рука", tip: "Легкий выдох." },
+          { en: "Head", ru: "Голова", tip: "Легкий выдох." },
+          { en: "Hair", ru: "Волосы", tip: "Легкий выдох." },
+          { en: "Hope", ru: "Надежда", tip: "Легкий выдох." },
+          { en: "Hear", ru: "Слышать", tip: "Легкий выдох." },
+          { en: "Hard", ru: "Трудный", tip: "Легкий выдох." },
+          { en: "Hundred", ru: "Сто", tip: "Легкий выдох." },
+          { en: "Behind", ru: "Позади", tip: "Легкий выдох." },
+          { en: "Perhaps", ru: "Возможно", tip: "Легкий выдох." }
+        ]
+      },
+      {
+        id: "L4S3", title: "Твердый /l/ (Dark L)", isTest: false,
+        description: '<div class="diagram"><svg viewBox="0 0 140 90"><path d="M 20,40 Q 70,10 120,40" stroke="#3498db" stroke-width="4" fill="none"/><path d="M 30,70 Q 80,70 110,60 Q 115,65 105,70 Q 70,80 30,80 Z" fill="#e74c3c" opacity="0.8"/><text x="80" y="30" font-size="10" fill="#c0392b">Задняя часть напряжена</text></svg><div class="diagram-text"><strong>Правило:</strong> В конце слова звук /l/ звучит <strong>твердо</strong> (как «л» в слове «стол»). Не смягчайте его (не говорите «ль»).</div></div>',
+        words: [
+          { en: "Full", ru: "Полный", tip: "Твердый Л." },
+          { en: "Pull", ru: "Тянуть", tip: "Твердый Л." },
+          { en: "Milk", ru: "Молоко", tip: "Твердый Л." },
+          { en: "Well", ru: "Хорошо", tip: "Твердый Л." },
+          { en: "Tell", ru: "Рассказывать", tip: "Твердый Л." },
+          { en: "Small", ru: "Маленький", tip: "Твердый Л." },
+          { en: "Wall", ru: "Стена", tip: "Твердый Л." },
+          { en: "Ball", ru: "Мяч", tip: "Твердый Л." },
+          { en: "Cold", ru: "Холодный", tip: "Твердый Л." },
+          { en: "Old", ru: "Старый", tip: "Твердый Л." },
+          { en: "Film", ru: "Фильм", tip: "Твердый Л." },
+          { en: "Feel", ru: "Чувствовать", tip: "Твердый Л." },
+          { en: "Real", ru: "Реальный", tip: "Твердый Л." },
+          { en: "People", ru: "Люди", tip: "Твердый Л." },
+          { en: "Table", ru: "Стол", tip: "Твердый Л." }
+        ]
+      },
+      {
+        id: "L4T", title: "📝 Тест", isTest: true,
+        quiz: [
+          { word: "Bird", correct: "R-окрашенный звук /ɜːr/ (язык назад)", wrong: "Четкое русское «ё»" },
+          { word: "Hello", correct: "Легкий выдох, без напряжения", wrong: "Русское «х»" },
+          { word: "Full", correct: "Твердый /l/ (как в «стол»)", wrong: "Мягкий /l/ (как в «соль»)" },
+          { word: "Girl", correct: "R-окрашенный звук /ɜːr/", wrong: "Четкое «ё» + «р»" },
+          { word: "Help", correct: "Легкий выдох", wrong: "Русское «х»" },
+          { word: "Milk", correct: "Твердый /l/", wrong: "Мягкий /l/" },
+          { word: "Work", correct: "R-окрашенный звук /ɜːr/", wrong: "Русское «ё»" },
+          { word: "Happy", correct: "Легкий выдох", wrong: "Русское «х»" },
+          { word: "Well", correct: "Твердый /l/", wrong: "Мягкий /l/" },
+          { word: "First", correct: "R-окрашенный звук /ɜːr/", wrong: "Русское «ё»" }
+        ]
+      }
+    ]
+  },
+  {
+    id: "level5", title: "Уровень 5", subtitle: "Финал: Schwa, сложные сочетания, аффрикаты, Большой Тест",
+    sections: [
+      {
+        id: "L5S1", title: "Слабые формы (Schwa)", isTest: false,
+        description: '<div class="diagram"><svg viewBox="0 0 140 90"><path d="M 40,40 Q 70,30 100,40" stroke="#3498db" stroke-width="4" fill="none"/><path d="M 40,60 Q 70,50 100,60" stroke="#3498db" stroke-width="4" fill="none"/><text x="30" y="80" font-size="10" fill="#c0392b">Рот расслаблен, едва открыт</text></svg><div class="diagram-text"><strong>Правило:</strong> Безударные гласные в английском языке превращаются в короткий, расслабленный звук <strong>/ə/</strong> (шва). Это самый частый звук в языке!</div></div>',
+        words: [
+          { en: "Banana", ru: "Банан", tip: "Звучит как bə-NA-nə." },
+          { en: "Camera", ru: "Камера", tip: "Звучит как CA-mə-rə." },
+          { en: "About", ru: "Около", tip: "Звучит как ə-BOUT." },
+          { en: "Above", ru: "Выше", tip: "Звучит как ə-BOVE." },
+          { en: "Sofa", ru: "Диван", tip: "Звучит как SO-fə." },
+          { en: "Problem", ru: "Проблема", tip: "Звучит как PROB-ləm." },
+          { en: "Computer", ru: "Компьютер", tip: "Звучит как com-PU-tə." },
+          { en: "Family", ru: "Семья", tip: "Звучит как FAM-ə-ly." },
+          { en: "Together", ru: "Вместе", tip: "Звучит как tə-GE-ther." },
+          { en: "Important", ru: "Важный", tip: "Звучит как im-POR-tənt." },
+          { en: "Animal", ru: "Животное", tip: "Звучит как AN-ə-məl." },
+          { en: "Alive", ru: "Живой", tip: "Звучит как ə-LIVE." },
+          { en: "Awake", ru: "Проснувшийся", tip: "Звучит как ə-WAKE." },
+          { en: "Alone", ru: "Один", tip: "Звучит как ə-LONE." },
+          { en: "America", ru: "Америка", tip: "Звучит как ə-ME-ri-cə." }
+        ]
+      },
+      {
+        id: "L5S2", title: "Сложные сочетания", isTest: false,
+        description: '<div class="diagram"><svg viewBox="0 0 140 90"><text x="20" y="40" font-size="24" fill="#3498db">S</text><text x="50" y="40" font-size="24" fill="#3498db">T</text><text x="80" y="40" font-size="24" fill="#3498db">R</text><text x="20" y="70" font-size="12" fill="#c0392b">Без гласных между ними!</text></svg><div class="diagram-text"><strong>Правило:</strong> В английском согласные могут идти подряд (2, 3 и даже 4). Не добавляйте между ними гласные звуки (не говорите «ст<strong>о</strong>п»).</div></div>',
+        words: [
+          { en: "Strengths", ru: "Сильные стороны", tip: "/strɛŋθs/." },
+          { en: "Texts", ru: "Тексты", tip: "/teksts/." },
+          { en: "Asked", ru: "Спросил", tip: "/æskt/." },
+          { en: "Glimpsed", ru: "Увидел мельком", tip: "/ɡlɪmpst/." },
+          { en: "Twelfths", ru: "Двенадцатые", tip: "/twelfθs/." },
+          { en: "Crisps", ru: "Чипсы", tip: "/krɪsps/." },
+          { en: "Scratch", ru: "Царапать", tip: "/skrætʃ/." },
+          { en: "Splash", ru: "Брызгать", tip: "/splæʃ/." },
+          { en: "Spring", ru: "Весна", tip: "/sprɪŋ/." },
+          { en: "Scream", ru: "Кричать", tip: "/skriːm/." },
+          { en: "Explain", ru: "Объяснять", tip: "/ɪkˈspleɪn/." },
+          { en: "Extreme", ru: "Экстрим", tip: "/ɪkˈstriːm/." },
+          { en: "Sixths", ru: "Шестые", tip: "/sɪksθs/." },
+          { en: "Prompt", ru: "Быстрый", tip: "/prɒmpt/." },
+          { en: "Tempted", ru: "Соблазненный", tip: "/temptɪd/." }
+        ]
+      },
+      {
+        id: "L5S3", title: "Аффрикаты и аспирация", isTest: false,
+        description: '<div class="diagram"><svg viewBox="0 0 140 90"><path d="M 20,40 Q 70,10 120,40" stroke="#3498db" stroke-width="4" fill="none"/><path d="M 30,70 Q 70,60 90,50 Q 100,45 105,55 Q 90,65 60,75 Q 40,80 30,80 Z" fill="#e74c3c" opacity="0.8"/><text x="70" y="25" font-size="10" fill="#c0392b">Твердый «ч» / «п» с выдохом</text></svg><div class="diagram-text"><strong>Правило:</strong> <strong>Аффрикаты</strong> /tʃ/ (chair) и /dʒ/ (job) звучат твёрдо, без русского смягчения. <strong>Аспирация</strong>: /p/, /t/, /k/ в начале ударного слога произносятся с сильным выдохом (pen, top, cat).</div></div>',
+        words: [
+          { en: "Chair", ru: "Стул", tip: "Твердый «ч» /tʃ/, без смягчения." },
+          { en: "Cheese", ru: "Сыр", tip: "Твердый «ч»." },
+          { en: "Child", ru: "Ребёнок", tip: "Твердый «ч»." },
+          { en: "Job", ru: "Работа", tip: "Мягкий звонкий /dʒ/, как «дж»." },
+          { en: "Judge", ru: "Судья", tip: "Звонкий /dʒ/." },
+          { en: "Vision", ru: "Зрение", tip: "Мягкий звонкий «ж» /ʒ/." },
+          { en: "Pleasure", ru: "Удовольствие", tip: "Мягкий звонкий «ж»." },
+          { en: "Pen", ru: "Ручка", tip: "P с сильным выдохом (аспирация)." },
+          { en: "Top", ru: "Верх", tip: "T с выдохом." },
+          { en: "Cat", ru: "Кошка", tip: "K с выдохом." },
+          { en: "Park", ru: "Парк", tip: "P с выдохом." },
+          { en: "Time", ru: "Время", tip: "T с выдохом." },
+          { en: "Key", ru: "Ключ", tip: "K с выдохом." },
+          { en: "Paper", ru: "Бумага", tip: "Первый P с выдохом." },
+          { en: "Teacher", ru: "Учитель", tip: "T с выдохом + твердый «ч»." }
+        ]
+      },
+      {
+        id: "L5T", title: "📝 Большой Тест", isTest: true,
+        quiz: [
+          { word: "Think", correct: "Язык между зубами (межзубный)", wrong: "Язык за зубами (как русское «с»)" },
+          { word: "Water", correct: "Звучит как «Wader» (Flap T)", wrong: "Звучит как «Water» (четкая T)" },
+          { word: "Ship", correct: "Краткий звук /ɪ/", wrong: "Долгий звук /iː/" },
+          { word: "Sing", correct: "Носовой звук /ŋ/ (без «г»)", wrong: "Звук /ŋg/ (с «г»)" },
+          { word: "Bird", correct: "R-окрашенный /ɜːr/", wrong: "Четкое «ё»" },
+          { word: "Chair", correct: "Твердый «ч» /tʃ/", wrong: "Мягкий «ч»" },
+          { word: "Pen", correct: "С сильным выдохом (аспирация)", wrong: "Без выдоха" },
+          { word: "Red", correct: "Язык вверх, без вибрации", wrong: "Раскатистое «р»" },
+          { word: "Banana", correct: "Безударные гласные звучат как /ə/", wrong: "Все гласные четкие" },
+          { word: "Strengths", correct: "Согласные идут подряд без гласных", wrong: "Добавляем гласные между согласными" },
+          { word: "Because", correct: "В быстрой речи звучит как «Cuz»", wrong: "Всегда произносится полностью" },
+          { word: "Hello", correct: "Легкий выдох (звук /h/)", wrong: "Русское «х»" },
+          { word: "Full", correct: "Твердый /l/", wrong: "Мягкий /l/" },
+          { word: "Vision", correct: "Мягкий звонкий «ж» /ʒ/", wrong: "Твердый «ж»" },
+          { word: "Cat", correct: "Широкий рот (/æ/) + выдох на K", wrong: "Узкий рот (/e/), без выдоха" }
+        ]
+      }
+    ]
+  }
+];
+
+function renderSection() {
+   
