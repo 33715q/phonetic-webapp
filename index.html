@@ -1,6 +1,325 @@
 <!DOCTYPE html>
 <html lang="ru">
-<head>
+<head>/* =====================================================================
+   СОСТОЯНИЕ + СОХРАНЕНИЕ ПРОГРЕССА
+   ===================================================================== */
+let currentLevel = 0;
+let currentSection = 0;
+const quizState = {};
+const LS_KEY = 'phonTrainerProgress_v6';
+
+function loadProgress() {
+    try {
+        const raw = localStorage.getItem(LS_KEY);
+        if (!raw) return;
+        const saved = JSON.parse(raw);
+        Object.keys(saved).forEach(id => { quizState[id] = saved[id]; });
+    } catch (e) {}
+}
+function saveProgress() {
+    try { localStorage.setItem(LS_KEY, JSON.stringify(quizState)); } catch (e) {}
+}
+
+const levelsEl = document.getElementById('levels-container');
+const tabsEl = document.getElementById('tabs-container');
+const contentEl = document.getElementById('content-container');
+
+/* =====================================================================
+   ОТРИСОВКА
+   ===================================================================== */
+function renderLevels() {
+    levelsEl.innerHTML = '';
+    ALL_LEVELS.forEach((lvl, i) => {
+        const b = document.createElement('button');
+        b.className = 'level-btn' + (i === currentLevel ? ' active' : '');
+        b.innerHTML = '<span class="lvl-num">' + (i+1) + '</span>' + lvl.title.replace('Уровень ', '');
+        b.title = lvl.subtitle;
+        b.onclick = () => { currentLevel = i; currentSection = 0; renderLevels(); renderTabs(); renderSection(); };
+        levelsEl.appendChild(b);
+    });
+}
+
+function renderTabs() {
+    tabsEl.innerHTML = '';
+    const lvl = ALL_LEVELS[currentLevel];
+    lvl.sections.forEach((sec, i) => {
+        let label = sec.title;
+        if (sec.isTest && quizState[sec.id] && quizState[sec.id].done) {
+            label += ' (' + quizState[sec.id].score + '/' + sec.quiz.length + ') ✓';
+        }
+        const b = document.createElement('button');
+        b.className = 'tab-btn' + (sec.isTest ? ' test-tab' : '') + (i === currentSection ? ' active' : '');
+        b.textContent = label;
+        b.onclick = () => { currentSection = i; renderTabs(); renderSection(); };
+        tabsEl.appendChild(b);
+    });
+}
+
+// (Функция renderSection была вставлена вами ранее, проверьте, что она есть)
+
+function escapeJs(s) { return s.replace(/\\/g, '\\\\').replace(/'/g, "\\'"); }
+
+/* =====================================================================
+   АУДИО
+   ===================================================================== */
+let audioSession = 0;
+let currentAudio = null;
+let currentUtterance = null;
+let currentWaveId = null;
+let currentBtn = null;
+
+function stopCurrentAudio() {
+    audioSession++;
+    if (currentAudio) { try { currentAudio.pause(); } catch (e) {} currentAudio = null; }
+    if ('speechSynthesis' in window) { try { speechSynthesis.cancel(); } catch (e) {} }
+    currentUtterance = null;
+    if (currentWaveId) {
+        const w = document.getElementById(currentWaveId);
+        if (w) w.classList.remove('active');
+        currentWaveId = null;
+    }
+    if (currentBtn) {
+        currentBtn.classList.remove('speaking');
+        currentBtn.disabled = false;
+        currentBtn = null;
+    }
+}
+
+function markStarted(waveId, btn) {
+    currentWaveId = waveId;
+    currentBtn = btn || null;
+    if (waveId) {
+        const w = document.getElementById(waveId);
+        if (w) w.classList.add('active');
+    }
+    if (btn) {
+        btn.classList.add('speaking');
+        btn.disabled = true;
+    }
+}
+
+function markFinished() {
+    if (currentWaveId) {
+        const w = document.getElementById(currentWaveId);
+        if (w) w.classList.remove('active');
+        currentWaveId = null;
+    }
+    if (currentBtn) {
+        currentBtn.classList.remove('speaking');
+        currentBtn.disabled = false;
+        currentBtn = null;
+    }
+}
+
+function tryGoogleTTS(text, slow, onSuccess, onFail, session) {
+    let url = 'https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=en-us&q=' + encodeURIComponent(text);
+    const audio = new Audio(url);
+    if (slow) { audio.playbackRate = 0.6; }
+    let settled = false;
+    const live = () => session === audioSession;
+    currentAudio = audio;
+    const timer = setTimeout(() => {
+        if (!settled) { settled = true; try { audio.pause(); } catch (e) {} if (live()) onFail(); }
+    }, 5000);
+    audio.onended = () => { if (!settled) { settled = true; clearTimeout(timer); if (live()) onSuccess(); } };
+    audio.onerror = () => { if (!settled) { settled = true; clearTimeout(timer); if (live()) onFail(); } };
+    audio.play().then(() => { if (!settled) { settled = true; clearTimeout(timer); if (live()) onSuccess(); } }).catch(() => { if (!settled) { settled = true; clearTimeout(timer); if (live()) onFail(); } });
+}
+
+function tryStreamElements(text, slow, onSuccess, onFail, session) {
+    let url = 'https://api.streamelements.com/kappa/v2/speech?voice=Brian&text=' + encodeURIComponent(text);
+    const audio = new Audio(url);
+    if (slow) { audio.playbackRate = 0.6; }
+    let settled = false;
+    const live = () => session === audioSession;
+    currentAudio = audio;
+    const timer = setTimeout(() => {
+        if (!settled) { settled = true; try { audio.pause(); } catch (e) {} if (live()) onFail(); }
+    }, 5000);
+    audio.onended = () => { if (!settled) { settled = true; clearTimeout(timer); if (live()) onSuccess(); } };
+    audio.onerror = () => { if (!settled) { settled = true; clearTimeout(timer); if (live()) onFail(); } };
+    audio.play().then(() => { if (!settled) { settled = true; clearTimeout(timer); if (live()) onSuccess(); } }).catch(() => { if (!settled) { settled = true; clearTimeout(timer); if (live()) onFail(); } });
+}
+
+function trySpeechSynthesis(text, slow, onSuccess, onFail, session) {
+    if (!('speechSynthesis' in window)) { onFail(); return; }
+    const live = () => session === audioSession;
+    try {
+        const voices = speechSynthesis.getVoices();
+        const voice = voices.find(v => /en[-_]US/i.test(v.lang)) || voices.find(v => /^en/i.test(v.lang)) || null;
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'en-US';
+        if (voice) u.voice = voice;
+        u.rate = slow ? 0.55 : 0.9;
+        u.onend = () => { if (live()) onSuccess(); };
+        u.onerror = () => { if (live()) onFail(); };
+        currentUtterance = u;
+        speechSynthesis.speak(u);
+    } catch (e) { if (live()) onFail(); }
+}
+
+function playAudio(text, waveId, btn, slow) {
+    if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData) {
+        window.Telegram.WebApp.sendData(JSON.stringify({
+            type: "word_heard",
+            level: currentLevel + 1,
+            word: text
+        }));
+    }
+    stopCurrentAudio();
+    const session = audioSession;
+    markStarted(waveId, btn);
+
+    tryGoogleTTS(text, slow,
+        () => { if (session === audioSession) markFinished(); },
+        () => {
+            if (session !== audioSession) return;
+            tryStreamElements(text, slow,
+                () => { if (session === audioSession) markFinished(); },
+                () => {
+                    if (session !== audioSession) return;
+                    trySpeechSynthesis(text, slow,
+                        () => { if (session === audioSession) markFinished(); },
+                        () => { if (session === audioSession) markFinished(); },
+                        session
+                    );
+                },
+                session
+            );
+        },
+        session
+    );
+}
+
+if ('speechSynthesis' in window) {
+    speechSynthesis.onvoiceschanged = () => { speechSynthesis.getVoices(); };
+    speechSynthesis.getVoices();
+}
+
+/* =====================================================================
+   ТЕСТ
+   ===================================================================== */
+function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+function loadQuestion(sectionId, quizData) {
+    const st = quizState[sectionId];
+    const qw = document.getElementById('qw-' + sectionId);
+    const qo = document.getElementById('qo-' + sectionId);
+    const qs = document.getElementById('qs-' + sectionId);
+    const qn = document.getElementById('qn-' + sectionId);
+    const qc = document.getElementById('qc-' + sectionId);
+    if (!qw) return;
+
+    if (st.q >= quizData.length) {
+        qw.textContent = "Тест завершен!";
+        qc.textContent = '';
+        qo.innerHTML = '';
+        qn.style.display = 'none';
+        qs.style.display = 'block';
+        let txt = "Вы набрали " + st.score + " из " + quizData.length + ". ";
+        if (st.score === quizData.length) txt += "Идеально! Вы настоящий фонетист! 🎉";
+        else if (st.score > quizData.length / 2) txt += "Отличный результат! Осталось чуть-чуть. 💪";
+        else txt += "Стоит еще раз повторить теорию. 👀";
+        qs.innerHTML = '<span style="font-size:22px;">' + txt + '</span>';
+        return;
+    }
+
+    st.answered = false;
+    qn.style.display = 'none';
+    qs.style.display = 'none';
+    qc.textContent = 'Вопрос ' + (st.q + 1) + ' из ' + quizData.length;
+
+    const q = quizData[st.q];
+    qw.textContent = q.word;
+    const options = shuffle([q.correct, q.wrong]);
+    qo.innerHTML = '';
+    options.forEach(opt => {
+        const b = document.createElement('button');
+        b.className = 'option-btn';
+        b.textContent = opt;
+        b.onclick = () => checkAnswer(sectionId, quizData, b, opt, q.correct);
+        qo.appendChild(b);
+    });
+}
+
+function checkAnswer(sectionId, quizData, btn, selected, correct) {
+    const st = quizState[sectionId];
+    if (st.answered) return;
+    st.answered = true;
+
+    if (selected === correct) {
+        btn.classList.add('correct');
+        st.score++;
+    } else {
+        btn.classList.add('wrong');
+        document.querySelectorAll('#qo-' + sectionId + ' .option-btn').forEach(b => {
+            if (b.textContent === correct) b.classList.add('correct');
+        });
+    }
+
+    const qo = document.getElementById('qo-' + sectionId);
+    qo.querySelectorAll('.option-btn').forEach(b => { b.disabled = true; });
+    const qs = document.getElementById('qs-' + sectionId);
+    qs.style.display = 'block';
+    qs.textContent = 'Текущий счёт: ' + st.score + ' из ' + (st.q + 1);
+    const qn = document.getElementById('qn-' + sectionId);
+    qn.textContent = (st.q + 1 >= quizData.length) ? 'Показать результат ➔' : 'Следующий вопрос ➔';
+    qn.style.display = 'inline-block';
+    saveProgress();
+    renderTabs();
+}
+
+function nextQuestion(sectionId, quizData) {
+    const st = quizState[sectionId];
+    st.q++;
+    if (st.q >= quizData.length) st.done = true;
+    saveProgress();
+    loadQuestion(sectionId, quizData);
+    renderTabs();
+}
+
+function restartQuiz(sectionId) {
+    let found = null;
+    for (const lvl of ALL_LEVELS) {
+        found = lvl.sections.find(s => s.id === sectionId);
+        if (found) break;
+    }
+    if (!found || !found.quiz) return;
+    quizState[sectionId] = { q: 0, score: 0, answered: false, done: false };
+    saveProgress();
+    loadQuestion(sectionId, found.quiz);
+    renderTabs();
+}
+
+/* =====================================================================
+   ФУНКЦИЯ ДЛЯ ГОЛОСА (КНОПКА "ПОВТОРИТЬ")
+   ===================================================================== */
+function requestVoice(word) {
+    if (window.Telegram && window.Telegram.WebApp) {
+        window.Telegram.WebApp.sendData(JSON.stringify({
+            type: "request_pronunciation",
+            word: word
+        }));
+        window.Telegram.WebApp.close();
+    }
+}
+
+/* =====================================================================
+   СТАРТ
+   ===================================================================== */
+const tg = window.Telegram?.WebApp;
+if (tg) { tg.ready(); tg.expand(); tg.setHeaderColor('#1F3A5F'); tg.setBackgroundColor('#f0f2f5'); }
+loadProgress();
+renderLevels();
+renderTabs();
+renderSection();
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
